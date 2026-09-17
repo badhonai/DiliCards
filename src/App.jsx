@@ -5,6 +5,7 @@ import JoinScreen from './components/JoinScreen.jsx';
 import GameScreen from './components/GameScreen.jsx';
 import EndOverlay from './components/EndOverlay.jsx';
 import LostOverlay from './components/LostOverlay.jsx';
+import OnboardModal from './components/OnboardModal.jsx';
 import { CFG } from './config.js';
 
 async function shareText(text, url){
@@ -23,7 +24,7 @@ export default function App(){
   const copyLink = async ()=>{
     try{
       await navigator.clipboard.writeText(g.roomLink());
-      g.showToast('📋 Link copied!');
+      g.showToast('Link copied');
     }catch(e){
       window.prompt('Copy this link:', g.roomLink());
     }
@@ -34,80 +35,73 @@ export default function App(){
       {g.screen==='menu' && (
         <MenuScreen
           name={g.name}
-          setName={g.setName}
+          avatar={g.avatar}
+          hasIdentity={g.name.trim().length>=2 && g.avatar!=null}
           sizePairs={g.sizePairs}
           setSizePairs={g.setSizePairs}
-          avatar={g.avatar}
-          onReroll={g.rerollAvatar}
-          pendingJoin={g.pendingJoin}
           onCreate={g.createGame}
           onJoin={g.joinGame}
+          onEditIdentity={()=>g.openOnboard(null)}
         />
       )}
 
       {g.screen==='host' && (
         <HostScreen
+          name={g.name}
+          avatar={g.avatar}
           roomCode={g.roomCode}
           roomLink={g.roomLink()}
-          hostName={g.hostName}
-          avatar={g.avatar}
+          sizePairs={g.sizePairs}
           onCopy={copyLink}
           onShare={()=>shareText(`Play ${CFG.GAME_NAME} with me! Join code: ${g.roomCode}`, g.roomLink())}
-          onCancel={g.goHome}
+          onGoHome={g.goHome}
         />
       )}
 
       {g.screen==='join' && (
         <JoinScreen
-          roomCode={g.roomCode}
-          joinErr={g.joinErr}
-          guestName={g.guestName}
+          name={g.name}
           avatar={g.avatar}
+          roomCode={g.roomCode}
+          connected={g.connected}
+          err={g.joinErr}
+          onGoHome={g.goHome}
           onRetry={g.tryJoin}
-          onCancel={g.goHome}
+          onCopyLink={copyLink}
         />
       )}
 
       {g.screen==='game' && g.view && (
-        <>
-          <GameScreen
-            view={g.view}
-            role={g.role}
-            hostName={g.hostName}
-            guestName={g.guestName}
-            avatar={g.avatar}
-            hostAvatar={g.hostAvatar}
-            guestAvatar={g.guestAvatar}
-            connected={g.connected}
-            muted={g.muted}
-            onCardTap={g.onCardTap}
-            onHome={g.goHome}
-            onMute={g.toggleMute}
-          />
-          {g.view.phase==='done' && !g.lost && (
-            <EndOverlay
-              view={g.view}
-              role={g.role}
-              hostName={g.hostName}
-              guestName={g.guestName}
-              avatar={g.avatar}
-              hostAvatar={g.hostAvatar}
-              guestAvatar={g.guestAvatar}
-              onRematch={g.startRematch}
-              onRematchReq={g.requestRematch}
-              onHome={g.goHome}
-            />
-          )}
-          {g.lost && (
-            <LostOverlay
-              role={g.role}
-              roomLink={g.roomLink()}
-              onCopyLink={copyLink}
-              onRejoin={g.role==='guest' ? g.tryJoin : ()=>g.setLost(false)}
-              onHome={g.goHome}
-            />
-          )}
-        </>
+        <GameScreen
+          S={g.view}
+          role={g.role}
+          name={g.name}
+          avatar={g.avatar}
+          muted={g.muted}
+          hostName={g.hostName}
+          guestName={g.guestName}
+          hostAvatar={g.hostAvatar}
+          guestAvatar={g.guestAvatar}
+          connected={g.connected}
+          lost={g.lost}
+          roomCode={g.roomCode}
+          roomLink={g.roomLink()}
+          onCardTap={g.onCardTap}
+          onGoHome={g.goHome}
+          onRematch={g.role==='host' ? g.startRematch : g.requestRematch}
+          onRetry={g.role==='guest' ? g.tryJoin : ()=>{}}
+          onCopyLink={copyLink}
+          onMute={g.toggleMute}
+        />
+      )}
+
+      {g.onboard.open && (
+        <OnboardModal
+          joinCode={g.onboard.joinCode}
+          initialName={g.name}
+          initialAvatar={g.avatar}
+          onSubmit={g.submitOnboard}
+        />
       )}
 
       {g.toast && <div className="toast show">{g.toast}</div>}

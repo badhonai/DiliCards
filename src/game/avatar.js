@@ -1,7 +1,8 @@
 /**
  * DILICARDS — player avatars
- * Every device gets a random Dili sticker as its PFP on first launch.
- * The choice is saved to localStorage so it stays the same every visit.
+ * The player picks one of the Dili stickers (first-launch popup, or
+ * tap the avatar later). The choice is saved to localStorage.
+ * No auto-random — the choice is always the user's.
  */
 import diliCool from '../assets/dili-cool.png';
 import diliFunny from '../assets/dili-funny.png';
@@ -12,30 +13,21 @@ import { CFG } from '../config.js';
 export const AVATARS = [diliCool, diliFunny, diliHands, diliHappy];
 const KEY = CFG.STORE_KEY + '-avatar';
 
-function randomIndex(){ return Math.floor(Math.random()*AVATARS.length); }
-
 export function saveAvatar(i){
   try{ localStorage.setItem(KEY, String(i)); }catch(e){ /* private mode */ }
 }
 
-/** Current avatar index — creates (and saves) a random one on first run. */
+/** Saved avatar index, or null if the user hasn't chosen yet. */
 export function loadAvatar(){
   try{
-    const v = parseInt(localStorage.getItem(KEY) || '', 10);
-    if(!Number.isNaN(v) && v>=0 && v<AVATARS.length) return v;
-  }catch(e){ /* fall through */ }
-  const i = randomIndex();
-  saveAvatar(i);
-  return i;
-}
-
-/** Pick a brand-new random avatar and save it. */
-export function rerollAvatar(){
-  const i = randomIndex();
-  saveAvatar(i);
-  return i;
+    const raw = localStorage.getItem(KEY);
+    if(raw==null) return null;
+    const v = parseInt(raw, 10);
+    if(v>=0 && v<AVATARS.length) return v;
+  }catch(e){ /* ignore */ }
+  return null;
 }
 
 export function avatarUrl(i){
-  return (i!=null && AVATARS[i]) ? AVATARS[i] : AVATARS[0];
+  return (i!=null && AVATARS[i]) ? AVATARS[i] : null;
 }

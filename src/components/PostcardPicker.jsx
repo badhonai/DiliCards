@@ -1,94 +1,93 @@
-import { useState, useEffect } from 'react';
-import { CFG } from '../config.js';
+import { useEffect, useRef, useState } from 'react';
+import { POSTCARD_VARIANTS, renderPostcard } from '../game/postcard.js';
 import XIcon from './XIcon.jsx';
-import {
-  VARIANTS, postcardDataURL, postcardBlob, postcardFileName,
-} from '../game/postcard.js';
+import { IconDownload, IconShare } from './Icons.jsx';
 
 /**
- * Victory postcards: 3 style variants rendered on <canvas>.
- * Pick one → Download PNG, native Share, or post straight to X.
+ * Winner share-cards: every background variant, rendered with the
+ * winner's name + avatar. Tap a card → download or share.
  */
-export default function PostcardPicker({ names, scores, isTie, winnerName, avatarUrl }){
-  const [thumbs, setThumbs] = useState({});
-  const [sel, setSel] = useState(VARIANTS[0].id);
-  const [busy, setBusy] = useState(false);
+export default function PostcardPicker({ winnerName, winnerAvatar, score, pairs }){
+  const [dataUrls, setDataUrls] = useState(null);
+  const [busy, setBusy] = useState(0);   // index currently sharing
+  const [toast, setToast] = useState('');
+  const toastTo = useRef(null);
 
-  const base = { names, scores, isTie, winnerName, avatarUrl };
+  const say = (m)=>{
+    setToast(m);
+    clearTimeout(toastTo.current);
+    toastTo.current = setTimeout(()=>setToast(''), 2200);
+  };
 
   useEffect(()=>{
-    let alive = true;
-    VARIANTS.forEach(async v=>{
-      try{
-        const url = await postcardDataURL({ ...base, variant: v }, 0.3);
-        if(alive) setThumbs(t=>({ ...t, [v.id]: url }));
-      }catch(e){ /* variant failed — stays hidden */ }
-    });
-    return ()=>{ alive = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const variant = VARIANTS.find(v=>v.id===sel);
-
-  async function download(){
-    setBusy(true);
-    try{
-      const blob = await postcardBlob({ ...base, variant });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = postcardFileName(winnerName, isTie);
-      a.click();
-      setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
-    }catch(e){ /* ignore */ }
-    setBusy(false);
-  }
-
-  async function shareFile(){
-    try{
-      const blob = await postcardBlob({ ...base, variant });
-      const file = new File([blob], postcardFileName(winnerName, isTie), { type:'image/png' });
-      if(navigator.canShare && navigator.canShare({ files:[file] })){
-        await navigator.share({ files:[file], title:'DiliCards', text:`${isTie ? 'We tied' : `${winnerName} won`} DiliCards! #DiliCards` });
-      } else {
-        download();
-        window.open(CFG.TWITTER, '_blank');
+    let cancelled = false;
+    (async ()=>{
+      const urls = [];
+      for(const v of POSTCARD_VARIANTS){
+        try{ urls.push(renderPostcard(v, { name:winnerName, avatar:winnerAvatar, score, pairs }).toDataURL('image/png')); }
+        catch(e){ urls.push(null); }
       }
-    }catch(e){ /* user cancelled */ }
-  }
+      if(!cancelled) setDataUrls(urls);
+    })();
+    return ()=>{ cancelled = true; };
+  }, [winnerName, winnerAvatar, score, pairs]);
 
-  const tweetHref =
-    'https://x.com/intent/tweet?text=' +
-    encodeURIComponent(`${isTie ? 'We tied' : `${winnerName} won`} a DiliCards match! 🎴 #DiliCards`);
+  const doShare = async (url, i)=>{
+    setBusy(i);
+    try{
+      const blob = await (await fetch(url)).blob();
+      const file = new File([blob], 'dilicards-champion.png', { type:'image/png' });
+      if(navigator.share && navigator.canShare && navigator.canShare({ files:[file] })){
+        await navigator.share({ files:[file], text:'I won DiliCards! Can you beat me? https://dilicard.badhon.online' });
+      } else {
+        // no native share → download + open compose in a new tab
+        download(url);
+        window.open('https://x.com/intent/tweet?text=' +
+          encodeURIComponent(`I won DiliCards with ${score} pairs! Can you beat me? https://dilicard.badhon.online`),
+          '_blank', 'noopener');
+        say('Image saved — paste it into the tweet');
+      }
+    } catch(e){ /* user cancelled */ }
+    setBusy(0);
+  };
+
+  const download = (url)=>{
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dilicards-champion.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
 
   return (
-    <div className="postcard">
-      <div className="postcard-title">🏆 Make your victory card!</div>
-      <div className="pc-thumbs">
-        {VARIANTS.map(v=>(
-          <button
-            key={v.id}
-            className={'pc-thumb' + (sel===v.id ? ' on' : '')}
-            onClick={()=>setSel(v.id)}
-            disabled={!thumbs[v.id]}
-          >
-            {thumbs[v.id]
-              ? <img src={thumbs[v.id]} alt={v.label}/>
-              : <span className="pc-loading">…</span>}
-            <span className="pc-name">{v.label}</span>
-          </button>
-        ))}
+    <div className="postcards">
+      <div className="postcards-title">Your champion postcards</div>
+      <div className="postcards-grid">
+        {POSTCARD_VARIANTS.map((v,i)=>{
+          const url = dataUrls && dataUrls[i];
+          return (
+            <div key={v.id} className="pc-item">
+              <div className="pc-frame" style={{aspectRatio: v.w + ' / ' + v.h}}>
+                {url
+                  ? <img className="pc-img" src={url} alt="Postcard"/>
+                  : <div className="pc-loading">Rendering…</div>}
+              </div>
+              {url && (
+                <div className="pc-actions">
+                  <button className="pc-btn" onClick={()=>download(url)}>
+                    <IconDownload size={15}/> Save
+                  </button>
+                  <button className="pc-btn" onClick={()=>doShare(url, i)} disabled={busy===i}>
+                    {busy===i ? <XIcon size={15}/> : <IconShare size={15}/>} {busy===i ? 'Sharing…' : 'Share'}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
-      <div className="pc-actions">
-        <button className="btn" onClick={download} disabled={busy}>
-          {busy ? 'Making…' : '⬇ Download PNG'}
-        </button>
-        <div className="pc-row2">
-          <button className="btn btn-soft" onClick={shareFile}>📤 Share</button>
-          <a className="btn btn-soft" target="_blank" rel="noreferrer" href={tweetHref}>
-            <XIcon size={14}/> Post on X
-          </a>
-        </div>
-      </div>
+      {toast && <div className="pc-toast">{toast}</div>}
     </div>
   );
 }

@@ -1,232 +1,173 @@
 /**
- * ─────────────────────────────────────────────────────────────
- *  DILICARDS — victory postcards
+ * DILICARDS — winner postcards (pending design approval)
  *
- *  After a win, the winner's phone generates shareable 1080×1350
- *  cards (4:5 — perfect for Twitter/X posts) with their name,
- *  the final score, a Dili sticker and your links.
- *  Three style variants; download or share straight to X.
- * ─────────────────────────────────────────────────────────────
+ * Six AI-generated backgrounds (3 square 1:1 + 3 wide 16:9, no text
+ * baked in). The canvas composes, per variant:
+ *   • the user's logo (top corner)
+ *   • the winner's Dili sticker
+ *   • "CHAMPION" + the winner's name + score
+ *   • DiliCards + site footer
+ *
+ * 1:1  → text centered in the clean middle, sticker bottom-center
+ * 16:9 → text block on the left, sticker in the clean right third
  */
-import { CFG } from '../config.js';
-import diliHands from '../assets/dili-handsup.png';
-import diliFunny from '../assets/dili-funny.png';
+import logo from '../assets/logo.gif';
+import { avatarUrl } from './avatar.js';
 
-export const POSTCARD_W = 1080;
-export const POSTCARD_H = 1350;
+import pc11Sunset from '../assets/postcards/pc-1-1-sunset.jpg';
+import pc11Night  from '../assets/postcards/pc-1-1-night.jpg';
+import pc11Mint   from '../assets/postcards/pc-1-1-mint.jpg';
+import pc169Sunset from '../assets/postcards/pc-16-9-sunset.jpg';
+import pc169Night  from '../assets/postcards/pc-16-9-night.jpg';
+import pc169Clay   from '../assets/postcards/pc-16-9-clay.jpg';
 
-export const VARIANTS = [
-  {
-    id: 'sunset', label: 'Sunset',
-    bgTop: '#fff3e2', bgBot: '#ffd9c0',
-    blobA: 'rgba(255,178,130,0.5)', blobB: 'rgba(196,178,242,0.5)',
-    ink: '#46345a', sub: 'rgba(70,52,90,0.55)',
-    accent: '#f0835a', accentInk: '#fff8f2',
-    circle: 'rgba(255,255,255,0.75)', chip: '#fff6ec',
-  },
-  {
-    id: 'night', label: 'Night',
-    bgTop: '#251b42', bgBot: '#120d22',
-    blobA: 'rgba(120,96,220,0.35)', blobB: 'rgba(64,150,190,0.3)',
-    ink: '#f4efff', sub: 'rgba(244,239,255,0.55)',
-    accent: '#8b78e6', accentInk: '#fff',
-    circle: 'rgba(255,255,255,0.12)', chip: 'rgba(255,255,255,0.1)',
-  },
-  {
-    id: 'mint', label: 'Mint',
-    bgTop: '#eefaf1', bgBot: '#cfeadd',
-    blobA: 'rgba(126,214,168,0.45)', blobB: 'rgba(196,178,242,0.45)',
-    ink: '#2f4a3c', sub: 'rgba(47,74,60,0.55)',
-    accent: '#3fa077', accentInk: '#fff',
-    circle: 'rgba(255,255,255,0.75)', chip: '#f2fcf6',
-  },
+export const POSTCARD_VARIANTS = [
+  { id:'sunset',  w:1080, h:1080, bg:pc11Sunset,  ink:'#3a2314', ink2:'#6b4325', accent:'#ff9a5c', layout:'center' },
+  { id:'night',   w:1080, h:1080, bg:pc11Night,   ink:'#f3ecff', ink2:'#b9a8d8', accent:'#8f7bff', layout:'center' },
+  { id:'mint',    w:1080, h:1080, bg:pc11Mint,    ink:'#1e3a31', ink2:'#4a7a68', accent:'#2fbf8f', layout:'center' },
+  { id:'sunset16', w:1920, h:1080, bg:pc169Sunset, ink:'#3a2314', ink2:'#6b4325', accent:'#ff9a5c', layout:'side' },
+  { id:'night16',  w:1920, h:1080, bg:pc169Night,  ink:'#f3ecff', ink2:'#b9a8d8', accent:'#8f7bff', layout:'side' },
+  { id:'clay16',   w:1920, h:1080, bg:pc169Clay,   ink:'#33241a', ink2:'#6b5138', accent:'#d96f3f', layout:'side' },
 ];
 
 function roundRect(ctx, x, y, w, h, r){
   ctx.beginPath();
   ctx.moveTo(x+r, y);
-  ctx.arcTo(x+w, y, x+w, y+h, r);
-  ctx.arcTo(x+w, y+h, x, y+h, r);
-  ctx.arcTo(x, y+h, x, y, r);
-  ctx.arcTo(x, y, x+w, y, r);
+  ctx.arcTo(x+w, y,   x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x,   y+h, r);
+  ctx.arcTo(x,   y+h, x,   y,   r);
+  ctx.arcTo(x,   y,   x+w, y,   r);
   ctx.closePath();
 }
 
-/** Fit text into maxWidth, shrinking from startSize. */
-function fitFont(ctx, text, family, weight, startSize, maxWidth){
-  let size=startSize;
-  while(size>28){
-    ctx.font=`${weight} ${size}px ${family}`;
-    if(ctx.measureText(text).width<=maxWidth) break;
-    size-=4;
-  }
-  return size;
+function fitDrawImage(ctx, img, x, y, maxW, maxH){
+  const ar = img.width/img.height;
+  let w = maxW, h = w/ar;
+  if(h > maxH){ h = maxH; w = h*ar; }
+  ctx.drawImage(img, x + (maxW-w)/2, y + (maxH-h)/2, w, h);
 }
 
-/**
- * Geometry of the winner-name line (avatar circle + fitted name),
- * shared by the text pass (renderPostcard) and the avatar pass
- * (postcardToCanvas draws the image on top).
- */
-function nameGeometry(ctx, disp, hasAv){
-  const W=POSTCARD_W, H=POSTCARD_H, cx=W/2;
-  const av = hasAv ? 120 : 0;
-  const gap = hasAv ? 28 : 0;
-  const ns = fitFont(ctx, disp, FONT, '900', 118, W-160 - (av?av+gap:0));
-  ctx.font=`900 ${ns}px ${FONT}`;
-  const nameW=ctx.measureText(disp).width;
-  const startX=cx-(av+gap+nameW)/2;
-  return {
-    disp, ns, av, gap, startX,
-    nameX: startX+av+gap,
-    baseY: H*0.775,
-    avCx: startX+av/2,
-    avCy: H*0.775 - ns*0.34,
-  };
-}
-
-const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-
-/** Draw a postcard onto `canvas`. */
-export function renderPostcard(canvas, opts){
-  const { names, scores, isTie, variant, winnerName } = opts;
-  const W=POSTCARD_W, H=POSTCARD_H;
-  canvas.width=W; canvas.height=H;
-  const ctx=canvas.getContext('2d');
-  const v=variant;
-
-  // ── background
-  const g=ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0, v.bgTop); g.addColorStop(1, v.bgBot);
-  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-
-  ctx.fillStyle=v.blobA;
-  ctx.beginPath(); ctx.arc(W*0.08, H*0.16, 300, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle=v.blobB;
-  ctx.beginPath(); ctx.arc(W*0.94, H*0.30, 340, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle=v.blobA;
-  ctx.beginPath(); ctx.arc(W*0.5, H*1.04, 460, 0, Math.PI*2); ctx.fill();
-
-  // ── title
-  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillStyle=v.ink;
-  ctx.font=`900 84px ${FONT}`;
-  ctx.fillText('🎴 DILICARDS', W/2, 150);
-  ctx.fillStyle=v.sub;
-  ctx.font=`800 34px ${FONT}`;
-  ctx.fillText('2 - P H O N E   M E M O R Y   D U E L', W/2, 205);
-
-  // ── sticker circle
-  const cx=W/2, cy=H*0.40, R=280;
-  ctx.fillStyle=v.circle;
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
-
-  // ── sticker (drawn async by caller? no — we pre-load images before calling)
-  // (artUrl is drawn via the Image cache in postcardToCanvas)
-
-  // ── banner
-  const banner=isTie ? "IT'S A TIE!" : '🏆 WINNER!';
-  ctx.font=`900 84px ${FONT}`;
-  const bw=ctx.measureText(banner).width+170, bh=136;
-  const bx=cx-bw/2, by=H*0.615;
-  ctx.fillStyle=v.accent;
-  roundRect(ctx, bx, by, bw, bh, bh/2); ctx.fill();
-  ctx.fillStyle=v.accentInk;
-  ctx.fillText(banner, cx, by+bh/2+30);
-
-  // ── winner name (avatar circle is drawn on top by postcardToCanvas)
-  const disp=(isTie ? 'Tied Game' : (winnerName || 'Winner')).slice(0,20);
-  const ng=nameGeometry(ctx, disp, !!opts.avatarUrl);
-  ctx.fillStyle=v.ink;
-  ctx.font=`900 ${ng.ns}px ${FONT}`;
-  ctx.textAlign='left';
-  ctx.fillText(disp, ng.nameX, ng.baseY);
-  ctx.textAlign='center';
-
-  // ── score line
-  ctx.font=`900 104px ${FONT}`;
-  const sTxt=`${scores[1]} : ${scores[2]}`;
-  ctx.fillText(sTxt, cx, H*0.865);
-  ctx.font=`800 42px ${FONT}`;
-  ctx.fillStyle=v.sub;
-  const n1=(names?.[1]||'Player 1').slice(0,14), n2=(names?.[2]||'Player 2').slice(0,14);
-  ctx.fillText(`${n1}   vs   ${n2}`, cx, H*0.915);
-
-  // ── footer
-  ctx.font=`700 40px ${FONT}`;
-  ctx.fillStyle=v.sub;
-  ctx.fillText('Played live on two phones ⚡  ·  #DiliCards', cx, H*0.962);
-  ctx.font=`800 40px ${FONT}`;
-  ctx.fillStyle=v.ink;
-  ctx.fillText(`${CFG.SITE.replace('https://','')}  ·  ${CFG.TWITTER_HANDLE} on X`, cx, H*0.998-14);
-}
-
-/**
- * Load sticker images, then draw. Returns the canvas.
- * Pre-loads once per session.
- */
-const imgCache={};
-function loadImage(src){
-  if(imgCache[src]) return imgCache[src];
-  imgCache[src]=new Promise((res,rej)=>{
-    const im=new Image();
-    im.onload=()=>res(im);
-    im.onerror=rej;
-    im.src=src;
+function drawWord(ctx, text, cx, y, charGap, font, fill){
+  ctx.font = font;
+  ctx.textAlign = 'left';
+  const widths=[...text].map(ch=>ctx.measureText(ch).width);
+  const total = widths.reduce((a,b)=>a+b,0) + charGap*(text.length-1);
+  let x = cx - total/2;
+  const prevAlign = ctx.textAlign;
+  [...text].forEach((ch,i)=>{
+    ctx.fillText(ch, x, y);
+    x += widths[i] + charGap;
   });
-  return imgCache[src];
+  ctx.textAlign = prevAlign;
 }
 
-export async function postcardToCanvas(opts){
-  const artUrl = opts.isTie ? diliFunny : diliHands;
-  const [img, avImg] = await Promise.all([
-    loadImage(artUrl),
-    opts.avatarUrl ? loadImage(opts.avatarUrl) : Promise.resolve(null),
-  ]);
-  const canvas=document.createElement('canvas');
-  renderPostcard(canvas, opts);
-  const ctx=canvas.getContext('2d');
+/**
+ * Render one postcard → canvas.
+ * @param variant  one of POSTCARD_VARIANTS
+ * @param {object} d  { name, avatar (index|null), score, pairs }
+ */
+export function renderPostcard(variant, d){
+  const { w, h, ink, ink2, accent, layout } = variant;
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
 
-  // big sticker on top (after base render so it sits over the circle)
-  const cx=POSTCARD_W/2, cy=POSTCARD_H*0.40;
-  const s=430;
-  ctx.save();
-  ctx.shadowColor='rgba(0,0,0,0.30)';
-  ctx.shadowBlur=40; ctx.shadowOffsetY=18;
-  ctx.drawImage(img, cx-s/2, cy-s/2, s, s);
-  ctx.restore();
+  // 1) background (cover)
+  const img = new Image();
+  img.src = variant.bg;
+  if(!img.complete) throw new Error('bg not ready');
+  const ar = img.width/img.height;
+  const car = w/h;
+  let dw, dh;
+  if(ar > car){ dh = h; dw = h*ar; } else { dw = w; dh = w/ar; }
+  ctx.drawImage(img, (w-dw)/2, (h-dh)/2, dw, dh);
 
-  // winner's avatar circle, left of their name
-  if(avImg && opts.avatarUrl){
-    const disp=(opts.isTie ? 'Tied Game' : (opts.winnerName||'Winner')).slice(0,20);
-    const ng=nameGeometry(ctx, disp, true);
-    const r=ng.av/2;
-    ctx.save();
-    ctx.beginPath(); ctx.arc(ng.avCx, ng.avCy, r, 0, Math.PI*2); ctx.clip();
-    ctx.drawImage(avImg, ng.avCx-r*1.12, ng.avCy-r*1.12, r*2.24, r*2.24);
-    ctx.restore();
-    ctx.lineWidth=8;
-    ctx.strokeStyle='rgba(255,255,255,0.9)';
-    ctx.beginPath(); ctx.arc(ng.avCx, ng.avCy, r+5, 0, Math.PI*2); ctx.stroke();
+  // subtle vignette to seat the text
+  const vg = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)*0.35, w/2, h/2, Math.max(w,h)*0.75);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.28)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, w, h);
+
+  const S = w/1080;                     // scale unit
+  const center = layout==='center';
+
+  // 2) logo top-center (or top-left on wide)
+  const logoSize = 110*S;
+  const logoImg = new Image();
+  logoImg.src = logo;
+  if(!logoImg.complete) throw new Error('logo not ready');
+  if(center){
+    ctx.drawImage(logoImg, w/2 - logoSize/2, 48*S, logoSize, logoSize);
+  } else {
+    ctx.drawImage(logoImg, 64*S, 48*S, logoSize, logoSize);
   }
+
+  // 3) avatar sticker
+  const avSize = center ? 300*S : 380*S;
+  const avY = center ? h - avSize - 90*S : h/2 - avSize/2;
+  const avX = center ? w/2 - avSize/2 : w - avSize - 100*S;
+  const avImg = avatarUrl(d.avatar);
+  if(avImg){
+    const av = new Image();
+    av.src = avImg;
+    if(!av.complete) throw new Error('avatar not ready');
+    // soft glow behind the sticker
+    const glow = ctx.createRadialGradient(avX+avSize/2, avY+avSize/2, avSize*0.2,
+                                          avX+avSize/2, avY+avSize/2, avSize*0.75);
+    glow.addColorStop(0, 'rgba(255,255,255,0.35)');
+    glow.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(avX-avSize, avY-avSize, avSize*3, avSize*3);
+    ctx.drawImage(av, avX, avY, avSize, avSize);
+  }
+
+  // 4) text block
+  const name = (d.name||'CHAMPION').slice(0, 14).toUpperCase();
+  if(center){
+    const topY = 48*S + logoSize + 120*S;
+    // "CHAMPION"
+    ctx.fillStyle = accent;
+    ctx.textAlign = 'center';
+    ctx.font = `700 ${44*S}px system-ui, sans-serif`;
+    drawWord(ctx, 'CHAMPION', w/2, topY, 14*S, `700 ${44*S}px system-ui, sans-serif`, accent);
+    // name
+    ctx.fillStyle = ink;
+    let nameSize = 130*S;
+    ctx.font = `800 ${nameSize}px system-ui, sans-serif`;
+    while(ctx.measureText(name).width > w - 160*S && nameSize > 56*S) nameSize -= 6*S;
+    ctx.font = `800 ${nameSize}px system-ui, sans-serif`;
+    ctx.fillText(name, w/2, topY + nameSize*0.95);
+    // score
+    ctx.fillStyle = ink2;
+    ctx.font = `600 ${46*S}px system-ui, sans-serif`;
+    ctx.fillText(`${d.score} / ${d.pairs} pairs`, w/2, topY + nameSize*0.95 + 76*S);
+  } else {
+    const leftX = 120*S;
+    const topY = h/2 - 150*S;
+    ctx.fillStyle = accent;
+    ctx.textAlign = 'left';
+    ctx.font = `700 ${48*S}px system-ui, sans-serif`;
+    ctx.fillText('CHAMPION', leftX, topY);
+    // name
+    ctx.fillStyle = ink;
+    let nameSize = 170*S;
+    ctx.font = `800 ${nameSize}px system-ui, sans-serif`;
+    while(ctx.measureText(name).width > w - 1000 && nameSize > 70*S) nameSize -= 8*S;
+    ctx.font = `800 ${nameSize}px system-ui, sans-serif`;
+    ctx.fillText(name, leftX, topY + nameSize);
+    // score
+    ctx.fillStyle = ink2;
+    ctx.font = `600 ${52*S}px system-ui, sans-serif`;
+    ctx.fillText(`${d.score} / ${d.pairs} pairs`, leftX, topY + nameSize + 84*S);
+  }
+
+  // 5) footer
+  ctx.fillStyle = ink2;
+  ctx.font = `600 ${30*S}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  const foot = 'DILICARDS  ·  dilicard.badhon.online  ·  @BadhonAI';
+  ctx.fillText(foot, w/2, h - 44*S);
+
   return canvas;
-}
-
-export async function postcardDataURL(opts, scale=0.36){
-  const full=await postcardToCanvas(opts);
-  const c=document.createElement('canvas');
-  c.width=Math.round(POSTCARD_W*scale);
-  c.height=Math.round(POSTCARD_H*scale);
-  c.getContext('2d').drawImage(full, 0, 0, c.width, c.height);
-  return c.toDataURL('image/png');
-}
-
-export async function postcardBlob(opts){
-  const canvas=await postcardToCanvas(opts);
-  return new Promise(res=>canvas.toBlob(res, 'image/png'));
-}
-
-export function postcardFileName(winnerName, isTie){
-  const safe=String(winnerName||'winner').replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'').slice(0,18)||'winner';
-  return `dilicards-${isTie?'tie':safe}-winner.png`;
 }

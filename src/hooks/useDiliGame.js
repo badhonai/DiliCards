@@ -6,12 +6,9 @@
  *  Guest → mirrors state from syncs, sends tap intents
  *  Both  → same UI, sounds, haptics, wake lock, reconnect
  *
- *  Robustness rules learned from the field:
- *   • a NEW connection always takes over (stale/half-open conns are
- *     replaced, never treated as "room full")
- *   • the guest NEVER spins forever: every failure mode has a timeout
- *     and a friendly error (nohost / network / timeout / hostgone / init)
- *   • names are mandatory; avatars + names are saved per device
+ *  Onboarding: first launch (or a first-time join link) shows a
+ *  popup to pick a name + Dili avatar. A join link never bounces
+ *  to the home screen — submit goes straight into the game.
  * ─────────────────────────────────────────────────────────────
  */
 import { useState, useRef, useEffect, useReducer, useCallback } from 'react';
@@ -22,7 +19,7 @@ import {
 } from '../game/engine.js';
 import { createHost, createGuest, send, makeCode } from '../game/net.js';
 import { ensureAudio, sfx, buzz, setMuted } from '../game/audio.js';
-import { loadAvatar, rerollAvatar as pickNewAvatar } from '../game/avatar.js';
+import { loadAvatar, saveAvatar } from '../game/avatar.js';
 
 function loadName(){ try{ return localStorage.getItem(CFG.STORE_KEY)||''; }catch(e){ return ''; } }
 function saveName(n){ try{ localStorage.setItem(CFG.STORE_KEY, n||''); }catch(e){} }
@@ -35,13 +32,13 @@ export function useDiliGame(){
   const [role, setRole] = useState(null);
   const [sizePairs, setSizePairs] = useState(CFG.BOARD_SIZES[1].pairs);
   const [name, setName] = useState(loadName());
-  const [avatar, setAvatar] = useState(()=>loadAvatar());
+  const [avatar, setAvatar] = useState(()=>loadAvatar());   // null until the user picks
+  const [onboard, setOnboard] = useState({ open:false, joinCode:null });
   const [hostName, setHostName] = useState('');
   const [guestName, setGuestName] = useState('');
   const [hostAvatar, setHostAvatar] = useState(null);
   const [guestAvatar, setGuestAvatar] = useState(null);
   const [roomCode, setRoomCode] = useState(null);
-  const [pendingJoin, setPendingJoin] = useState(null);   // ?join=CODE arrived but no name saved yet
   const [connected, setConnected] = useState(false);
   const [lost, setLost] = useState(false);
   const [joinErr, setJoinErr] = useState(null);
@@ -61,6 +58,7 @@ export function useDiliGame(){
   const screenRef = useRef(null);
   const hostNameRef = useRef('');
   const guestNameRef = useRef('');
+  const nameRef = useRef('');
   const avatarRef = useRef(null);
   const initRef = useRef(false);
   const wakeRef = useRef(null);
@@ -69,6 +67,7 @@ export function useDiliGame(){
   screenRef.current = screen;
   hostNameRef.current = hostName;
   guestNameRef.current = guestName;
+  nameRef.current = name;
   avatarRef.current = avatar;
 
   const showToast = useCallback((msg)=>{
@@ -82,7 +81,29 @@ export function useDiliGame(){
     return location.origin + location.pathname + '?join=' + roomCode;
   }, [roomCode]);
 
-  const rerollAvatar = useCallback(()=>{ setAvatar(pickNewAvatar()); }, []);
+  const chooseAvatar = useCallback((i)=>{
+    saveAvatar(i);
+    setAvatar(i);
+  }, []);
+
+  /* open the name+PFP popup (change mode when identity exists) */
+  const openOnboard = useCallback((joinCode=null)=>{
+    setOnboard({ open:true, joinCode });
+  }, []);
+
+  /* popup submitted → save identity; a pending join goes straight in */
+  const submitOnboard = useCallback((newName, newAvatar)=>{
+    saveName(newName);
+    saveAvatar(newAvatar);
+    nameRef.current = newName;     // refs updated NOW (state is async) so the
+    avatarRef.current = newAvatar; // pending join sees the fresh identity
+    guestNameRef.current = newName;
+    setName(newName);
+    setAvatar(newAvatar);
+    const code = onboard.joinCode;
+    setOnboard({ open:false, joinCode:null });
+    if(code) joinGameRef.current(code);
+  }, [onboard.joinCode]);
 
   /* ── wake lock (keep screen on during the game) ── */
   const requestWake = useCallback(()=>{
@@ -113,7 +134,7 @@ export function useDiliGame(){
       const to = checkTimeout(S);
       if(to){
         sfx('timeout'); buzz(80);
-        showToast("⏰ Time's up! Turn passed");
+        showToast("Time's up! Turn passed");
         sendSync('timeout');
       } else if(t && t.ev==='tick'){
         sendSync('tick');
@@ -132,7 +153,7 @@ export function useDiliGame(){
     if(ev==='flip'){ sfx('flip'); buzz(15); }
     else if(ev==='match'){ sfx('match'); buzz([30,40,30]); }
     else if(ev==='nomatch'){ sfx('nomatch'); buzz(50); }
-    else if(ev==='timeout'){ sfx('timeout'); buzz(80); showToast("⏰ Time's up! Turn passed"); }
+    else if(ev==='timeout'){ sfx('timeout'); buzz(80); showToast("Time's up! Turn passed"); }
     else if(ev==='end'){ sfx('win'); buzz([60,50,60,50,100]); }
   }, [showToast]);
 
@@ -181,7 +202,7 @@ export function useDiliGame(){
       if(fx.ev==='end'){ sfx('win'); buzz([60,50,60,50,100]); }
       else if(fx.ev==='match') { sfx('match'); buzz([30,40,30]); }
       else if(fx.ev==='nomatch'){ sfx('nomatch'); buzz(50); }
-      else if(fx.ev==='timeout'){ sfx('timeout'); buzz(80); showToast("⏰ Time's up! Turn passed"); }
+      else if(fx.ev==='timeout'){ sfx('timeout'); buzz(80); showToast("Time's up! Turn passed"); }
       bump();
     }
     else if(m.t==='tap' && r==='host'){
@@ -268,8 +289,11 @@ export function useDiliGame(){
   /* ── host flow ── */
   const createGame = useCallback(()=>{
     ensureAudio();
-    const my=(name||'').trim().slice(0,14);
-    if(!validName(name)){ showToast('✍️ Enter your name first (2+ letters)'); return; }
+    if(!validName(nameRef.current) || avatarRef.current==null){
+      openOnboard(null);
+      return;
+    }
+    const my=nameRef.current.trim().slice(0,14);
     saveName(my);
     setRole('host');
     setHostName(my);
@@ -304,7 +328,7 @@ export function useDiliGame(){
     netRef.current?.destroy();
     netRef.current = createHost(code, hostHandlers);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, sizePairs, onFriend, handleMsg, onFriendLost, showToast, bump]);
+  }, [name, avatar, sizePairs, onFriend, handleMsg, onFriendLost, showToast, openOnboard, bump]);
 
   /* ── guest flow ── */
   const tryJoin = useCallback((codeOverride)=>{
@@ -348,19 +372,25 @@ export function useDiliGame(){
     ensureAudio();
     const code=String(codeRaw||'').trim().toUpperCase();
     if(code.length<4){ showToast('Enter the 6-letter code'); return; }
-    if(!validName(name)){ showToast('✍️ Enter your name first (2+ letters)'); return; }
-    const my=(name||'').trim().slice(0,14);
+    if(!validName(nameRef.current) || avatarRef.current==null){
+      // first-time join → popup, then STRAIGHT into the game
+      openOnboard(code);
+      return;
+    }
+    const my=nameRef.current.trim().slice(0,14);
     saveName(my);
+    guestNameRef.current = my;
     setRole('guest');
     setGuestName(my);
     setHostName('');
     setHostAvatar(null);
     setRoomCode(code);
-    setPendingJoin(null);
     setLost(false);
     setScreen('join');
     tryJoin(code);
-  }, [name, tryJoin, showToast]);
+  }, [tryJoin, showToast, openOnboard]);
+  const joinGameRef = useRef(null);
+  joinGameRef.current = joinGame;
 
   /* ── card tap (both roles) ── */
   const onCardTap = useCallback((id)=>{
@@ -412,7 +442,6 @@ export function useDiliGame(){
     setLost(false);
     setJoinErr(null);
     setRoomCode(null);
-    setPendingJoin(null);
     setHostName('');
     setGuestName('');
     setHostAvatar(null);
@@ -433,15 +462,19 @@ export function useDiliGame(){
     });
   }, []);
 
-  /* ── auto-join from ?join=CODE link ──
-     First-time visitors have no saved name → the menu asks for one
-     (with the code pre-filled) instead of joining anonymously. */
+  /* ── first launch / join-link onboarding ──
+     • ?join=CODE with a saved identity  → join immediately
+     • ?join=CODE without one            → popup, then straight into the game
+     • no link, identity missing          → popup, then the menu  */
   useEffect(()=>{
     const p=new URLSearchParams(location.search);
     const j=(p.get('join')||'').toUpperCase();
+    const hasIdentity = validName(loadName()) && loadAvatar()!=null;
     if(j.length>=4){
-      if(validName(loadName())) joinGame(j);
-      else setPendingJoin(j);
+      if(hasIdentity) joinGame(j);
+      else setOnboard({ open:true, joinCode:j });
+    } else if(!hasIdentity){
+      setOnboard({ open:true, joinCode:null });
     }
     return ()=>{
       stopTimerLoop();
@@ -454,9 +487,10 @@ export function useDiliGame(){
     screen, role, view: SRef.current, connected, lost, joinErr, toast, muted,
     sizePairs, setSizePairs,
     name, setName,
-    avatar, rerollAvatar,
+    avatar, chooseAvatar,
+    onboard, openOnboard, submitOnboard,
     hostName, guestName, hostAvatar, guestAvatar,
-    roomCode, roomLink, pendingJoin,
+    roomCode, roomLink,
     createGame, joinGame, tryJoin,
     onCardTap, goHome, startRematch, requestRematch, toggleMute,
     setLost, setJoinErr, showToast,

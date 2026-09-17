@@ -1,24 +1,32 @@
-import diliCool from '../assets/dili-cool.png';
+import { IconCopy, IconHome, IconRefresh } from './Icons.jsx';
 
-/** The connection to the other player dropped. */
-export default function LostOverlay({ role, roomLink, onCopyLink, onRejoin, onHome }){
-  const isHost = role==='host';
+/**
+ * "Opponent disconnected" overlay.
+ * Host: the room stays alive — friend can rejoin, or you can go home.
+ * Guest: the room lives on the host's phone — retry or go home.
+ */
+export default function LostOverlay({ isHost, roomCode, roomLink, onGoHome, onRetry, onCopyLink }){
   return (
-    <div className="overlay">
-      <div className="panel end-panel">
-        <img className="end-sticker" src={diliCool} alt=""/>
-        <h2 className="end-title">Connection lost 📡</h2>
-        <p className="end-msg">
+    <div className="overlay lost-overlay">
+      <div className="panel lost-panel">
+        <h2 className="lost-title">Opponent left</h2>
+        <p className="lost-sub">
           {isHost
-            ? 'Your friend dropped. The room is still open — if they open the same link they\'ll rejoin instantly.'
-            : 'Lost contact with your friend. Tap retry to jump back into the room.'}
+            ? <>Your room is still open for <b>2 minutes</b> — if they reopen the link they'll rejoin this game. You can also start fresh.</>
+            : <>The host's game ended. You can <b>reconnect</b> right away, or head back home.</>}
         </p>
-        <div className="btnstack">
-          <button className="btn" onClick={onRejoin}>
-            {isHost ? '↻ Wait for them again' : '↻ Rejoin room'}
-          </button>
-          <button className="btn btn-soft" onClick={onCopyLink}>📋 Copy game link</button>
-          <button className="btn btn-soft" onClick={onHome}>🏠 Home</button>
+        {isHost && (
+          <div className="code-display sm">
+            {roomCode}
+            <div className="code-sub">their link still works</div>
+          </div>
+        )}
+        <div className="btn-row">
+          {isHost
+            ? <button className="btn primary" onClick={onGoHome}><IconHome size={17}/> Start fresh / home</button>
+            : <button className="btn primary" onClick={onRetry}><IconRefresh size={17}/> Reconnect</button>}
+          {!isHost && <button className="btn" onClick={onGoHome}><IconHome size={17}/> Home</button>}
+          <button className="btn" onClick={onCopyLink}><IconCopy size={16}/> Copy link</button>
         </div>
       </div>
     </div>

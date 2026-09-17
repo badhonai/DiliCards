@@ -2,23 +2,25 @@ import { useState } from 'react';
 import { CFG } from '../config.js';
 import { avatarUrl } from '../game/avatar.js';
 import XIcon from './XIcon.jsx';
+import { IconGame, IconLink, IconPencil, IconUsers } from './Icons.jsx';
 import diliHappy from '../assets/dili-happy.png';
 import diliCool from '../assets/dili-cool.png';
 import diliFunny from '../assets/dili-funny.png';
+import logo from '../assets/logo.gif';
 
 /**
  * The home screen.
- * Identity (random Dili avatar + mandatory, saved name) →
- * Create / Join action cards → board size → how-to.
+ * Identity (pick your Dili + name) → Create / Join action cards.
  */
 export default function MenuScreen({
-  name, setName, sizePairs, setSizePairs,
-  avatar, onReroll, pendingJoin,
-  onCreate, onJoin,
+  name, avatar, hasIdentity,
+  sizePairs, setSizePairs,
+  onCreate, onJoin, onEditIdentity,
 }){
-  const [joinCode, setJoinCode] = useState(pendingJoin || '');
-  const canPlay = (name||'').trim().length>=2;
-  const joinTarget = (joinCode||'').trim().toUpperCase() || pendingJoin || '';
+  const [joinCode, setJoinCode] = useState('');
+  const canPlay = hasIdentity;
+  const joinTarget = (joinCode||'').trim().toUpperCase();
+  const avSrc = avatarUrl(avatar);
 
   return (
     <div className="menu-wrap">
@@ -26,34 +28,31 @@ export default function MenuScreen({
       <div className="menu-deco deco-funny"><img src={diliFunny} alt=""/></div>
 
       <div className="menu-head">
-        <h1 className="logo">🎴 DiliCards</h1>
+        <div className="logo-row">
+          <img className="logo-img" src={logo} alt=""/>
+          <h1 className="logo">DiliCards</h1>
+        </div>
         <div className="tag">Flip 2 · Match them · Beat your friend</div>
         <div className="mascot"><img src={diliHappy} alt="Dili"/></div>
       </div>
 
       <div className="panel-clay menu-panel">
-        {/* ── identity: your random Dili + name ── */}
-        <div className="identity">
+        {/* ── identity: your Dili + name ── */}
+        <button className="identity" onClick={onEditIdentity} aria-label="Edit name and avatar">
           <div className="id-avatar">
-            <img src={avatarUrl(avatar)} alt="Your avatar"/>
-            <button className="reroll" onClick={onReroll} title="New random avatar" aria-label="New random avatar">🎲</button>
+            {avSrc
+              ? <img src={avSrc} alt="Your avatar"/>
+              : <span className="id-avatar-empty"><IconPencil/></span>}
+            <span className="id-edit" aria-hidden="true"><IconPencil size={12}/></span>
           </div>
           <div className="id-main">
-            <label className="chip-label" htmlFor="dc-name">YOUR NAME</label>
-            <input
-              id="dc-name"
-              className="field"
-              value={name}
-              onChange={e=>setName(e.target.value)}
-              maxLength={14}
-              placeholder="Type your name…"
-              autoComplete="off"
-            />
+            <span className="chip-label">YOUR NAME</span>
+            {name
+              ? <span className="id-name">{name}</span>
+              : <span className="id-name empty">Tap to choose a name & avatar</span>}
           </div>
-        </div>
-        {!canPlay && (
-          <div className="need-name">✍️ A name is required (2+ letters) — it's saved on this phone, so only once.</div>
-        )}
+          <span className="id-go">→</span>
+        </button>
 
         {/* ── board size ── */}
         <div className="chip-label">BOARD SIZE</div>
@@ -73,7 +72,7 @@ export default function MenuScreen({
           disabled={!canPlay}
           onClick={onCreate}
         >
-          <div className="ac-icon">🎮</div>
+          <div className="ac-icon"><IconGame size={26}/></div>
           <div className="ac-body">
             <div className="ac-title">Create game</div>
             <div className="ac-sub">You're Player 1 (blue) — get a code & link to share</div>
@@ -83,7 +82,7 @@ export default function MenuScreen({
 
         {/* ── join ── */}
         <div className="action-card join">
-          <div className="ac-icon">🚪</div>
+          <div className="ac-icon"><IconLink size={24}/></div>
           <div className="ac-body">
             <div className="ac-title">Join a game</div>
             <input
@@ -103,24 +102,24 @@ export default function MenuScreen({
           >Join</button>
         </div>
 
-        {pendingJoin && (
+        {!canPlay && (
           <div className="pending-banner">
-            🚪 You're joining room <b>{pendingJoin}</b> — enter your name, then tap <b>Join</b>.
+            <IconUsers size={15}/> Tap your name above to pick a name & Dili — then create or join.
           </div>
         )}
 
         <details className="howto">
-          <summary>❓ How to play</summary>
+          <summary>How to play</summary>
           <p>
             You have <b>10 seconds per turn</b>. Flip <b>2 cards</b>!
             Match → <b>+1 point</b> and go again. No match (or time's up) →
             the cards flip back and it's your friend's turn.
-            Clear the board → <b>most pairs wins</b> 🏆
+            Clear the board → <b>most pairs wins</b>.
           </p>
         </details>
 
         <a className="tw-btn" href={CFG.TWITTER} target="_blank" rel="noreferrer">
-          <XIcon/> Follow <b>{CFG.TWITTER_HANDLE}</b> on X
+          <XIcon size={17}/> Follow <b>{CFG.TWITTER_HANDLE}</b> on X
         </a>
 
         <div className="hint">

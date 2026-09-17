@@ -69,31 +69,32 @@ await pump(30);
 const H = ()=>hostG.g, G = ()=>guestG.g;   // always read the latest hook object
 
 try{
-  /* ── 0. name is mandatory ── */
+  /* ── 0. identity is mandatory, chosen (never random) ── */
   await act(async()=>{ H().createGame(); });
-  ok(H().screen==='menu', 'create without a name is refused');
-  ok(typeof H().avatar==='number' && H().avatar>=0 && H().avatar<4, 'device got a random Dili avatar (0-3)');
+  ok(H().screen==='menu' && H().onboard.open===true, 'create without identity → onboarding popup');
+  ok(H().avatar===null, 'no random avatar before the user chooses one');
+  await act(async()=>{ H().submitOnboard('Host1', 0); });
+  ok(H().onboard.open===false && H().name==='Host1' && H().avatar===0, 'onboard saves the chosen name + Dili');
 
   /* ── 1. host creates a room ── */
-  await act(async()=>{ H().setName('Host1'); });
   await act(async()=>{ H().createGame(); });
   ok(H().screen==='host' && /^[A-Z2-9]{6}$/.test(H().roomCode), 'host on waiting screen with 6-char code');
   ok(H().roomLink().includes('?join='+H().roomCode), 'shareable join link built');
 
-  /* ── 2. guest joins ── */
+  /* ── 2. guest joins for the first time → popup, then straight in ── */
   const code = H().roomCode;
   await act(async()=>{ G().joinGame(code); });
-  ok(G().screen==='menu', 'join without a name is refused (stays on menu)');
-  await act(async()=>{ G().setName('Guest1'); });
-  await act(async()=>{ G().joinGame(code); });
-  ok(G().screen==='join', 'guest on joining screen');
+  ok(G().screen==='menu' && G().onboard.open===true && G().onboard.joinCode===code,
+     'first-time join → onboarding popup with the room code (not the home screen)');
+  await act(async()=>{ G().submitOnboard('Guest1', 2); });
+  ok(G().screen==='join', 'onboard submit → straight into the game (no home screen)');
 
   await waitUntil(()=>H().screen==='game' && G().screen==='game', 'both phones in the game');
   ok(true, 'connection established → both phones show the board');
   ok(H().connected && G().connected, 'connection dot green on both');
   ok(G().hostName===H().hostName && H().guestName==='Guest1', 'names exchanged both ways');
-  ok(typeof G().hostAvatar==='number', 'guest received host avatar');
-  ok(typeof H().guestAvatar==='number', 'host received guest avatar');
+  ok(G().hostAvatar===0, 'guest received host avatar');
+  ok(H().guestAvatar===2, 'host received guest avatar');
   ok(H().view.deck.join(',')===G().view.deck.join(','), 'guest got the same deck');
   ok(G().view.cards.every(c=>c.state==='down'), 'guest board starts face-down');
   ok(H().view.turn===1, 'host (Player 1) goes first');
@@ -183,8 +184,9 @@ try{
   const g2 = {};
   const g2Root = create(React.createElement(Driver, { register:g=>{ g2.g=g; } }));
   await pump(30);
-  await act(async()=>{ g2.g.setName('Guest1'); });
   await act(async()=>{ g2.g.joinGame(code); });
+  ok(g2.g.onboard.open===true && g2.g.onboard.joinCode===code, 'rejoining phone without identity → onboarding popup');
+  await act(async()=>{ g2.g.submitOnboard('Guest1', 3); });
   await waitUntil(()=>g2.g.screen==='game' && H().connected, 'rejoined guest in the game');
   await waitUntil(()=>g2.g.view && g2.g.view.phase===before.phase && g2.g.view.deck.join(',')===before.deck,
     'rejoin sync applied');
