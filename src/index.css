@@ -149,14 +149,14 @@ a{ color:inherit; text-decoration:none; }
 .identity:active{ transform:scale(.98); }
 .id-avatar{
   position:relative; width:54px; height:54px; border-radius:50%;
-  background:#f3e2cc; overflow:visible; flex:0 0 auto;
+  background:#f3e2cc; overflow:hidden; flex:0 0 auto;
   display:flex; align-items:center; justify-content:center;
   box-shadow:inset 0 2px 6px rgba(120,70,30,.18);
 }
 .id-avatar img{ width:46px; height:46px; position:absolute; }
 .id-avatar-empty{ color:var(--ink-faint); }
 .id-edit{
-  position:absolute; right:-3px; bottom:-3px;
+  position:absolute; right:2px; bottom:2px;
   width:22px; height:22px; border-radius:50%;
   background:var(--clay); color:#fff;
   display:flex; align-items:center; justify-content:center;
@@ -542,7 +542,53 @@ button.action-card.create{
   margin-top:10px; font-size:12px; font-weight:700; color:#3f7d5a;
 }
 
-/* ═══════════════ ONBOARDING ═══════════════ */
+/* ═══════════════ SCORECARDS (winner share card) ═══════════════ */
+.scorecard{ text-align:left; }
+.sc-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:10px; margin-bottom:2px;
+}
+.sc-head .postcards-title{ margin-bottom:0; }
+.sc-eyebtn{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 12px; border-radius:999px;
+  background:var(--cream); color:var(--ink-soft);
+  font-weight:700; font-size:12px;
+  border:1.5px solid rgba(122,90,65,.16);
+  box-shadow:var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,.7);
+  transition:all .12s ease;
+}
+.sc-eyebtn.on{
+  background:rgba(207,106,49,.12); color:var(--amber-deep);
+  border-color:rgba(207,106,49,.35);
+}
+.sc-variants{ display:flex; gap:8px; margin:10px 0; }
+.sc-variant{
+  flex:1; padding:9px 10px; border-radius:999px;
+  background:var(--cream); color:var(--ink-soft);
+  font-weight:700; font-size:13px;
+  border:2px solid rgba(122,90,65,.14);
+  transition:all .15s ease;
+}
+.sc-variant.on{
+  background:linear-gradient(180deg, #ffb877, var(--amber-deep));
+  color:#fff; border-color:transparent;
+  box-shadow:0 8px 18px -8px rgba(207,106,49,.6);
+}
+.sc-frame{
+  border-radius:14px; overflow:hidden; position:relative;
+  box-shadow:var(--shadow-sm); background:#eee;
+}
+.sc-img{ display:block; width:100%; height:100%; object-fit:cover; }
+.sc-actions{ display:flex; gap:8px; margin-top:10px; }
+.sc-actions .pc-btn{ padding:11px 8px; font-size:13px; }
+.sc-actions .pc-btn.tw{
+  background:linear-gradient(180deg, #fdebd8, #f8e0c6);
+  color:#6b4a33;
+}
+.sc-hint{ margin-top:8px; font-size:11.5px; line-height:1.45; color:var(--ink-faint); }
+
+
 .onboard-overlay{ align-items:flex-end; padding:0; }
 .onboard-panel{
   border-radius:28px 28px 0 0;
@@ -560,7 +606,7 @@ button.action-card.create{
   background:linear-gradient(180deg, var(--cream), #f7e5cd);
   border:2.5px solid rgba(122,90,65,.14);
   display:flex; align-items:center; justify-content:center;
-  transition:all .15s ease; overflow:visible;
+  transition:all .15s ease; overflow:hidden;
 }
 .pfp img{ width:72%; pointer-events:none; }
 .pfp.on{
@@ -570,7 +616,7 @@ button.action-card.create{
   box-shadow:0 10px 20px -8px rgba(217,111,63,.55);
 }
 .pfp-check{
-  position:absolute; right:-4px; bottom:-4px;
+  position:absolute; right:6px; bottom:6px;
   width:22px; height:22px; border-radius:50%;
   background:var(--clay-deep); color:#fff;
   display:flex; align-items:center; justify-content:center;

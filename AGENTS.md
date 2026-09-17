@@ -7,14 +7,16 @@ Read this first. It is the single source of truth for picking up work in a new s
 **DiliCards** — a 2-player, real-time, phone-vs-phone memory-match (concentration) game.
 - **No backend, no accounts, 100% free.** P2P over the free [PeerJS](https://peerjs.com) cloud (broker only for the handshake). The **host is authoritative** (runs the engine, enforces the timer); the guest mirrors state and sends tap intents.
 - Site (user-managed, static): **https://dilicard.badhon.online**
+- Short link for tweet captions: **https://dilicard.vercel.app** (redirects to the main site)
 - GitHub: **`badhonai/DiliCards`** (remote `https://github.com/badhonai/DiliCards.git`)
 - Brand/X: **@BadhonAI** → `https://x.com/BadhonAI`
 - Stack: **React 18 + Vite** (plain JS, no framework, no Tailwind). ~274 kB JS / 83 kB gzip.
 
 ## Current state (2026-09-17)
 
-- Latest commit: **`318ac8c`** — logo everywhere (no emoji), mobile-first board, avatar **picker**, first-join **onboarding popup**, softer follow button, 6 postcard variants (pending approval).
-- Full suite green: **engine 40 + render 30 + p2p 34 = 104/104**. Build clean.
+- Latest commit: winner **score cards shipped** (owner-approved "Hero" + "Banner" 16:9 backgrounds, winner-only, hide-opponent toggle, download + X share), new citrus **logo** (owner's art), warm-orange theme, fixed invisible-board bug.
+- Full suite green: **engine 40 + render 33 + p2p 34 = 107/107**. Build clean.
+- **Winner score cards are LIVE** (`CFG.SCORECARD_ENABLED = true`). Only the winner sees it in `EndOverlay` (`src/components/ScorecardPicker.jsx`): pick Hero or Banner background, optionally hide the opponent's name (renders as "???"), Save the PNG, or Share on X (opens `x.com/intent/tweet` with a canned caption). Caption uses the short link `https://dilicard.vercel.app` (redirects to the main site); the card footer shows `dilicard.badhon.online · @BadhonAI`. Renderer: `src/game/scorecard.js` (canvas, 1920×1080). Backgrounds: `src/assets/scorecards/`.
 - **WINNER POSTCARDS ARE ON HOLD.** Round 1 (6 AI backgrounds in `src/assets/postcards/`) was rejected by the owner verbatim: *"No one looks good. Ok i will add it later."* The feature is gated OFF by `CFG.POSTCARDS_ENABLED = false` in `src/config.js` (winner screen shows a "coming soon" nudge instead). To ship later: owner provides/approves designs → update `POSTCARD_VARIANTS` in `src/game/postcard.js` → set flag `true` → re-run tests/build. All machinery (canvas renderer, `PostcardPicker`, share/download) is already written and tested.
 
 ## Standing owner rules (explicit — never violate)
@@ -43,7 +45,8 @@ dilicards/
 │   ├── index.css              full clay UI (mobile-first, no emoji)
 │   ├── art.css                card-face backgrounds (the 10 GIFs)
 │   ├── assets/
-│   │   ├── logo.gif           owner logo (animated) — the game's icon
+│   │   ├── logo.png           owner's new citrus logo (warm clay orange, all UI)
+│   │   ├── logo-white.png     same logo in white (card-back mark)
 │   │   ├── art/art-0..9.gif   the ONLY card faces
 │   │   ├── dili-*.png         4 3D Dili stickers = avatar pool + mascots
 │   │   └── postcards/*.jpg    6 rejected round-1 postcard backgrounds (keep for now)
@@ -65,7 +68,8 @@ dilicards/
 │       ├── JoinScreen.jsx     connecting… + real error texts (no endless spinner)
 │       ├── GameScreen.jsx     TOP opp score card / Board / BOTTOM own score card + dock
 │       ├── Board.jsx          viewport-fitting board; re-packs on resize/orientation
-│       ├── EndOverlay.jsx     You win / X wins / tie (+ postcards when enabled)
+│       ├── EndOverlay.jsx     You win / X wins / tie (+ ScorecardPicker when winner)
+│       ├── ScorecardPicker.jsx winner-only: bg pick (Hero/Banner), hide-opponent, save, X share
 │       ├── LostOverlay.jsx    opponent-left (host: room stays open; guest: reconnect)
 │       ├── PostcardPicker.jsx renders all variants, Save/Share (native share + X intent)
 │       └── Icons.jsx / XIcon.jsx   SVG icon set (no emoji)
@@ -78,6 +82,9 @@ dilicards/
 │   ├── peer-loader.mjs        Node loader mapping 'peerjs' → fake (module.register)
 │   ├── register.mjs / hook-entry.js   test plumbing
 │   └── .tmp/                  build scratch (gitignored)
+│
+│ (dev-only, OUTSIDE the repo: /home/user/scripts/scorecards5.py generates
+│  the 5 scorecard backgrounds; /home/user/preview/ holds owner review PNGs)
 ├── legacy/index.html          old single-file v3 (264K) — history only, don't touch
 └── postcards/                 PREVIEW ARTIFACTS ONLY (not shipped):
     full/*.jpg (6 full-res mockups), thumb/*, x-post-mock.jpg, winner-screen.html
@@ -132,6 +139,6 @@ npm run dev        # Vite dev server (if you need live reload)
 
 ## Open items / likely next prompts
 
-1. **Winner postcards (owner will "add it later"):** when they send new designs (or pick from `postcards/full/`), swap the backgrounds in `POSTCARD_VARIANTS`, set `CFG.POSTCARDS_ENABLED = true`, re-test, re-build, push. Preview tooling that worked: PIL contact sheet of variants with logo + sticker + name + score.
-2. Anything gameplay-related: edit `config.js` + engine, keep the 104-assertion suite green.
+1. **Winner score cards (DONE, live):** Hero + Banner approved; tweak `SCORECARD_VARIANTS`/`renderScorecard` in `src/game/scorecard.js` for layout changes; the 3 extra backgrounds in `src/assets/scorecards/` are unreferenced (owner may approve more later — just add to `SCORECARD_VARIANTS`).
+2. Anything gameplay-related: edit `config.js` + engine, keep the 107-assertion suite green.
 3. Deploy: always remind the owner to upload `dist/*` after a build.

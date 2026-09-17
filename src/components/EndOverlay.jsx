@@ -1,6 +1,6 @@
 import { CFG } from '../config.js';
 import { avatarUrl } from '../game/avatar.js';
-import PostcardPicker from './PostcardPicker.jsx';
+import ScorecardPicker from './ScorecardPicker.jsx';
 import { IconCopy, IconHome, IconRefresh, IconTrophy } from './Icons.jsx';
 import logo from '../assets/logo.png';
 import diliHappy from '../assets/dili-happy.png';
@@ -30,6 +30,7 @@ export default function EndOverlay({
   const loserName = winnerIsHost ? theirName : myName;
   const loserAvatar = winnerIsHost ? theirAvatar : myAvatar;
   const winScore = winnerIsHost ? hostScore : guestScore;
+  const loseScore = winnerIsHost ? guestScore : hostScore;
 
   const mascot = isDraw ? diliFunny : (iWon ? diliHappy : diliCool);
 
@@ -72,13 +73,19 @@ export default function EndOverlay({
         </div>
 
         {isDraw ? null : iWon ? (
-          CFG.POSTCARDS_ENABLED ? (
-            <PostcardPicker
+          CFG.SCORECARD_ENABLED ? (
+            <ScorecardPicker
               winnerName={winnerName}
               winnerAvatar={winnerAvatar}
-              score={winScore}
-              pairs={S.pairs}
+              winnerScore={winScore}
+              oppName={loserName}
+              oppScore={loseScore}
             />
+          ) : CFG.POSTCARDS_ENABLED ? (
+            <div className="rematch-nudge">
+              <div className="rn-title">Champion postcards</div>
+              <div className="rn-sub">Shareable win cards are coming soon — for now, rematch and defend your crown.</div>
+            </div>
           ) : (
             <div className="rematch-nudge">
               <div className="rn-title">Champion postcards</div>

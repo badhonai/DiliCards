@@ -39,4 +39,8 @@ export const CFG = {
   //  "no one looks good. I will add it later." To ship: choose designs,
   //  update POSTCARD_VARIANTS in src/game/postcard.js, flip this to true.)
   POSTCARDS_ENABLED: false,
+
+  // Winner score cards (shareable). Owner approved the "Hero" + "Banner"
+  // backgrounds in src/assets/scorecards/ with the hide-opponent toggle.
+  SCORECARD_ENABLED: true,
 };
