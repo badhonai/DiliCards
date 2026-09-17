@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Flip Guess — Emoji Memory Duel</title>
-<meta name="description" content="Find the Dili pairs. 2 phones, live online, 100% free. Host shares a link, friend joins, play together! Characters by @BadhonAI (X).">
+<title>DiliCards — 2-Phone Memory Duel</title>
+<meta name="description" content="DiliCards — flip 2, find the match before time runs out! 2 phones, live online, 100% free. Characters by @BadhonAI (X).">
 <meta name="theme-color" content="#f6ead9">
 <style>
   :root{
@@ -294,7 +294,7 @@
 </head>
 <body>
   <header>
-    <div class="logo">🎴 Flip Guess</div>
+    <div class="logo">🎴 DiliCards</div>
     <div class="tag">2 phones · live online · 100% free</div>
   </header>
 
@@ -438,7 +438,7 @@
   "use strict";
 
   var CFG = {
-    PREFIX: 'flip-guess-room-',
+    PREFIX: 'dilicards-room-',
     ART: 10,              // number of Dili character sprites
     TURN_SECONDS: 10,     // time per turn
     JOIN_TIMEOUT: 15000,
@@ -465,8 +465,8 @@
 
   function other(p){ return p===1?2:1; }
   function myPlayer(){ return role==='host'?1:2; }
-  function loadName(){ try{ return localStorage.getItem('fg-name')||''; }catch(e){ return ''; } }
-  function saveName(n){ try{ localStorage.setItem('fg-name', n); }catch(e){} }
+  function loadName(){ try{ return localStorage.getItem('dc-name')||''; }catch(e){ return ''; } }
+  function saveName(n){ try{ localStorage.setItem('dc-name', n); }catch(e){} }
   function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
 
   /* ---------- screens & ui helpers ---------- */
@@ -565,7 +565,7 @@
   function shareLink(){
     var url=roomLink();
     if(navigator.share){
-      navigator.share({ title:'Flip Guess', text:'Join my Flip Guess game! Code: '+roomCode, url }).catch(function(){});
+      navigator.share({ title:'DiliCards', text:'Join my DiliCards game! Code: '+roomCode, url }).catch(function(){});
     } else copyLink();
   }
 

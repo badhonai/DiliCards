@@ -1,7 +1,9 @@
-# 🎴 Flip Guess — Dili Memory Duel (Online)
+# 🎴 DiliCards — 2-Phone Memory Duel
 
 A 2-player **memory game** played live between **two phones**.
 One player hosts, gets a link, shares it — the other opens it on their own phone and you play together in real time.
+
+**Flip 2, find the match before time runs out!** ⏱️
 
 **100% free · no accounts · no server to run**
 
@@ -11,7 +13,7 @@ Soft clay theme 🍬 · Dili pixel-art card sprites · scattered cards (no grid,
 
 **Option 1 — GitHub Pages (free, automatic):**
 > When GitHub Pages is enabled (Settings → Pages → branch `main`, root), the game is live at:
-> `https://badhonai.github.io/flip-guess/`
+> `https://badhonai.github.io/dilicards/`
 
 **Option 2 — Netlify Drop (instant):**
 1. Go to https://app.netlify.com/drop
