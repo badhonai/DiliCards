@@ -11,7 +11,7 @@
  * 1:1  → text centered in the clean middle, sticker bottom-center
  * 16:9 → text block on the left, sticker in the clean right third
  */
-import logo from '../assets/logo.gif';
+import logo from '../assets/logo.png';
 import { avatarUrl } from './avatar.js';
 
 import pc11Sunset from '../assets/postcards/pc-1-1-sunset.jpg';

@@ -13,9 +13,9 @@
   --clay:#e9895b;
   --clay-deep:#d96f3f;
   --cream:#fff7ec;
-  --blue:#5f7fd9;
-  --blue-deep:#4a67bd;
-  --blue-soft:#e8edfb;
+  --amber:#f5a25e;
+  --amber-deep:#cf6a31;
+  --amber-soft:#fde6cf;
   --gold:#e8b04b;
   --shadow:0 18px 40px -18px rgba(90,50,20,.45);
   --shadow-sm:0 8px 20px -10px rgba(90,50,20,.4);
@@ -204,8 +204,8 @@ button.action-card.create{
   box-shadow:0 8px 16px -8px rgba(217,111,63,.7);
 }
 .action-card.join .ac-icon{
-  background:linear-gradient(180deg, #7d97e4, var(--blue-deep));
-  box-shadow:0 8px 16px -8px rgba(74,103,189,.7);
+  background:linear-gradient(180deg, #ffb877, var(--amber-deep));
+  box-shadow:0 8px 16px -8px rgba(207,106,49,.7);
 }
 .ac-body{ flex:1; min-width:0; }
 .ac-title{ font-weight:800; font-size:15.5px; }
@@ -214,18 +214,18 @@ button.action-card.create{
 .code-input{
   margin-top:7px; width:100%; max-width:190px;
   padding:9px 13px; border-radius:12px;
-  border:2px solid rgba(74,103,189,.3);
-  background:var(--blue-soft); color:var(--ink);
+  border:2px solid rgba(207,106,49,.3);
+  background:var(--amber-soft); color:var(--ink);
   font-size:16px; font-weight:800; letter-spacing:.28em; font-family:inherit;
   text-transform:uppercase; outline:none;
 }
-.code-input:focus{ border-color:var(--blue); }
+.code-input:focus{ border-color:var(--amber); }
 .code-input::placeholder{ letter-spacing:.14em; color:var(--ink-faint); font-weight:600; font-size:12.5px; }
 .ac-go{
   padding:11px 20px; border-radius:999px; flex:0 0 auto;
-  background:linear-gradient(180deg, #7d97e4, var(--blue-deep)); color:#fff;
+  background:linear-gradient(180deg, #ffb877, var(--amber-deep)); color:#fff;
   font-weight:800; font-size:14.5px;
-  box-shadow:0 8px 18px -8px rgba(74,103,189,.7);
+  box-shadow:0 8px 18px -8px rgba(207,106,49,.7);
 }
 
 .pending-banner{
@@ -250,14 +250,14 @@ button.action-card.create{
   display:flex; align-items:center; justify-content:center; gap:9px;
   margin-top:16px; padding:14px 18px;
   border-radius:999px;
-  background:linear-gradient(180deg, #f4f1ff 0%, #eae5fb 100%);
-  border:1.5px solid rgba(95,127,217,.25);
-  color:#5a5f7a; font-weight:700; font-size:14.5px;
-  box-shadow:0 6px 14px -8px rgba(90,90,140,.35);
+  background:linear-gradient(180deg, #fdebd8 0%, #f8e0c6 100%);
+  border:1.5px solid rgba(238,150,86,.25);
+  color:#6b4a33; font-weight:700; font-size:14.5px;
+  box-shadow:0 6px 14px -8px rgba(180,120,70,.35);
   transition:transform .12s ease;
 }
 .tw-btn:active{ transform:scale(.98); }
-.tw-btn b{ color:#3f4460; font-weight:800; }
+.tw-btn b{ color:#4a2f1d; font-weight:800; }
 
 .hint{
   margin-top:13px; font-size:12.5px; line-height:1.5; color:var(--ink-faint); font-weight:500;
@@ -352,11 +352,11 @@ button.action-card.create{
 .hud-top{ display:flex; flex-direction:column; gap:5px; flex:0 0 auto; }
 .turnbar{
   height:7px; border-radius:999px; overflow:hidden;
-  background:rgba(95,127,217,.18);
+  background:rgba(238,150,86,.18);
 }
 .turnbar-fill{
   height:100%; border-radius:999px;
-  background:linear-gradient(90deg, #7d97e4, var(--blue));
+  background:linear-gradient(90deg, #ffb877, var(--amber));
   transition:width .25s linear;
 }
 .turnbar.urgent .turnbar-fill{ background:linear-gradient(90deg, #e0574a, #c73a2c); }
@@ -371,15 +371,15 @@ button.action-card.create{
   box-shadow:var(--shadow-sm);
 }
 .score-card.mine{
-  background:linear-gradient(180deg, var(--blue-soft), #dfe7fa);
-  border-color:rgba(74,103,189,.22);
+  background:linear-gradient(180deg, var(--amber-soft), #f8e3cd);
+  border-color:rgba(207,106,49,.22);
 }
 .sc-avatar{
   width:40px; height:40px; border-radius:50%; flex:0 0 auto;
   background:#f3e2cc; display:flex; align-items:center; justify-content:center;
   overflow:hidden;
 }
-.score-card.mine .sc-avatar{ background:#dfe6f8; }
+.score-card.mine .sc-avatar{ background:#f8e3cd; }
 .sc-avatar img{ width:34px; height:34px; }
 .sc-init, .sp-init{ font-weight:800; font-size:15px; color:var(--ink-soft); }
 .sc-main{ flex:1; min-width:0; display:flex; flex-direction:column; }
@@ -395,15 +395,15 @@ button.action-card.create{
   background:rgba(122,90,65,.1); color:var(--ink-soft);
   font-weight:800; font-size:16px;
 }
-.score-card.mine .sc-score{ background:rgba(74,103,189,.14); color:var(--blue-deep); }
+.score-card.mine .sc-score{ background:rgba(207,106,49,.14); color:var(--amber-deep); }
 .sc-score.live{
   background:linear-gradient(180deg, #ff9d6b, var(--clay-deep)); color:#fff;
   box-shadow:0 4px 12px -4px rgba(217,111,63,.7);
   animation:scorepulse 1.2s ease-in-out infinite;
 }
 .score-card.mine .sc-score.live{
-  background:linear-gradient(180deg, #7d97e4, var(--blue-deep));
-  box-shadow:0 4px 12px -4px rgba(74,103,189,.7);
+  background:linear-gradient(180deg, #ffb877, var(--amber-deep));
+  box-shadow:0 4px 12px -4px rgba(207,106,49,.7);
 }
 @keyframes scorepulse{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
 

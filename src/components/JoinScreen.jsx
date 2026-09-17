@@ -1,5 +1,5 @@
 import { avatarUrl } from '../game/avatar.js';
-import logo from '../assets/logo.gif';
+import logo from '../assets/logo.png';
 import { IconCopy, IconRefresh } from './Icons.jsx';
 
 const ERR_TEXT = {

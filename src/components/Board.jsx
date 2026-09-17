@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useMemo } from 'react';
 import { computeLayout } from '../game/layout.js';
-import logo from '../assets/logo.gif';
+import { CFG } from '../config.js';
+import logoMark from '../assets/logo-white.png';
 
 /**
  * The scattered card board.
@@ -15,6 +16,10 @@ export default function Board({ S, onCardTap }){
   const [lay, setLay] = useState(null);
   const deckKey = S.deck.join(',');
   const n = S.cards.length;
+
+  // Card size (as % of board width) for this board size — see CFG.LAYOUT.
+  // Fall back to the first board size rather than ever laying out a NaN board.
+  const pct = (CFG.LAYOUT[S.pairs] || CFG.LAYOUT[CFG.BOARD_SIZES[0].pairs] || { pct: 18 }).pct;
 
   // stable random tilt per card, per board
   const rots = useMemo(
@@ -34,7 +39,7 @@ export default function Board({ S, onCardTap }){
       const r = boardEl.getBoundingClientRect();
       if(!r.width || !r.height) return false;
       if(cancelled) return false;
-      setLay(computeLayout(r.width, r.height, n));
+      setLay(computeLayout(r.width, r.height, n, pct));
       return true;
     };
     const schedule = (ms=180)=>{
@@ -60,26 +65,29 @@ export default function Board({ S, onCardTap }){
       if(window.visualViewport) window.visualViewport.removeEventListener('resize', onVp);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deckKey, n]);
+  }, [deckKey, n, pct]);
 
   return (
     <div className="board-wrap" ref={wrapRef}>
       <div className="board" ref={boardRef}>
         {S.cards.map((c,i)=>{
           const p = lay?.pos?.[i];
+          const style = p && Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(lay.d) && lay.d > 0
+            ? {
+                width: lay.d,
+                transform: `translate(${(p.x - lay.d/2).toFixed(1)}px, ${(p.y - lay.d/2).toFixed(1)}px) rotate(${rots[i]}deg)`,
+              }
+            : undefined;
           return (
             <div
               key={c.id}
               className={`card${c.state!=='down' ? ' flipped' : ''}${c.state==='matched' ? ' matched' : ''}`}
-              style={p ? {
-                width: lay.d,
-                transform: `translate(${(p.x - lay.d/2).toFixed(1)}px, ${(p.y - lay.d/2).toFixed(1)}px) rotate(${rots[i]}deg)`,
-              } : undefined}
+              style={style}
               onClick={()=>onCardTap(c.id)}
             >
               <div className="card-inner">
-                <div className="face face--back"><img className="back-mark" src={logo} alt=""/></div>
-                <div className={`face face--front art-${c.art}`}/>
+                <div className="face face--back"><img className="back-mark" src={logoMark} alt=""/></div>
+                <div className={`face face--front${c.art!=null ? ` art-${c.art}` : ''}`}/>
               </div>
             </div>
           );

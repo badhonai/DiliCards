@@ -6,7 +6,7 @@ import { IconGame, IconLink, IconPencil, IconUsers } from './Icons.jsx';
 import diliHappy from '../assets/dili-happy.png';
 import diliCool from '../assets/dili-cool.png';
 import diliFunny from '../assets/dili-funny.png';
-import logo from '../assets/logo.gif';
+import logo from '../assets/logo.png';
 
 /**
  * The home screen.

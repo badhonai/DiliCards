@@ -2,7 +2,7 @@ import { CFG } from '../config.js';
 import { avatarUrl } from '../game/avatar.js';
 import PostcardPicker from './PostcardPicker.jsx';
 import { IconCopy, IconHome, IconRefresh, IconTrophy } from './Icons.jsx';
-import logo from '../assets/logo.gif';
+import logo from '../assets/logo.png';
 import diliHappy from '../assets/dili-happy.png';
 import diliFunny from '../assets/dili-funny.png';
 import diliCool from '../assets/dili-cool.png';

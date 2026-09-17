@@ -1,7 +1,7 @@
 import { CFG } from '../config.js';
 import { avatarUrl } from '../game/avatar.js';
 import diliFunny from '../assets/dili-funny.png';
-import logo from '../assets/logo.gif';
+import logo from '../assets/logo.png';
 import { IconCopy, IconLink, IconRefresh, IconUsers } from './Icons.jsx';
 
 /**

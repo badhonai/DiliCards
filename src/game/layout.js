@@ -77,6 +77,9 @@ function relaxSafe(pos,r,pad,W,H){
  * @returns {{ d:number, pos:{x:number,y:number}[] }}  (d = card size in px)
  */
 export function computeLayout(W,H,n,pct){
+  // Defensive: a card size % must be a finite number, or every card ends
+  // up NaN-sized and invisible. Default to 18% of board width.
+  if(typeof pct!=='number' || !Number.isFinite(pct) || pct<=0) pct=18;
   const base=W*pct/100;
   let d=base, r=base*0.72, pad=base*0.14, pos=null;
   for(let s=1; s>=0.45 && !pos; s-=0.06){
