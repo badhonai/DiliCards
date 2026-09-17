@@ -20,6 +20,8 @@ export default function EndOverlay({
   const w = S.winner;
   const hostScore = S.scores[1];
   const guestScore = S.scores[2];
+  const myScore = isHost ? hostScore : guestScore;
+  const theirScore = isHost ? guestScore : hostScore;
 
   const iWon = (w===1 && isHost) || (w===2 && !isHost);
   const isDraw = w===0;
@@ -55,7 +57,7 @@ export default function EndOverlay({
               {w===1 && isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
               {w===2 && !isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
             </div>
-            <span className="fchip-score">{hostScore}</span>
+            <span className="fchip-score">{myScore}</span>
           </div>
           <div className="fchip">
             <span className="fchip-av">
@@ -68,7 +70,7 @@ export default function EndOverlay({
               {w===1 && !isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
               {w===2 && isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
             </div>
-            <span className="fchip-score">{guestScore}</span>
+            <span className="fchip-score">{theirScore}</span>
           </div>
         </div>
 

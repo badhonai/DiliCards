@@ -21,6 +21,9 @@ export default function GameScreen({
   const meAv = isHost ? avatar : guestAvatar;
   const themName = (isHost ? guestName : hostName) || (isHost ? 'Player 2' : 'Player 1');
   const themAv = isHost ? guestAvatar : hostAvatar;
+  // scores are stored as { 1: host, 2: guest } — resolve by role, never hardcode
+  const myScore = isHost ? S.scores[1] : S.scores[2];
+  const theirScore = isHost ? S.scores[2] : S.scores[1];
 
   // notMyTurn → opponent is thinking (their timer bar runs)
   const notMyTurn = S.phase==='play' && (isHost ? S.turn===2 : S.turn===1);
@@ -53,7 +56,7 @@ export default function GameScreen({
             <span className="sc-name">{themName}</span>
             <span className="sc-label">{notMyTurn ? 'their turn' : 'waiting'}</span>
           </div>
-          <span className={'sc-score' + (notMyTurn ? ' live' : '')}>{S.scores[1]}</span>
+          <span className={'sc-score' + (notMyTurn ? ' live' : '')} data-who="them">{theirScore}</span>
         </div>
         {oppBar}
       </div>
@@ -73,7 +76,7 @@ export default function GameScreen({
             <span className="sc-name">{myName} <em>(you)</em></span>
             <span className="sc-label">{!notMyTurn ? 'your turn, flip 2' : 'waiting'}</span>
           </div>
-          <span className={'sc-score mine' + (!notMyTurn ? ' live' : '')}>{S.scores[2]}</span>
+          <span className={'sc-score mine' + (!notMyTurn ? ' live' : '')} data-who="me">{myScore}</span>
         </div>
         {myBar}
         <div className="dock-actions">

@@ -85,6 +85,26 @@ try{
   ok(gGuest.includes('Rahim') && gGuest.includes('Mina'), 'guest view: opponent (Rahim) + own name (Mina)');
   ok(gGuest.includes('their turn'), 'guest view: their-turn label on opponent (top) card');
 
+  // role-aware scores: host reads own score from S.scores[1], guest from S.scores[2]
+  S.scores = { 1:4, 2:2 };
+  const gScore = renderToString(React.createElement(GameScreen, {
+    S, role:'host', name:'Badhon', avatar:0, muted:false,
+    hostName:'Badhon', guestName:'', hostAvatar:null, guestAvatar:null,
+    connected:true, lost:false, roomCode:'ABC123', roomLink:'http://x/?join=ABC123',
+    onCardTap:()=>{}, onGoHome:()=>{}, onRematch:()=>{}, onRetry:()=>{}, onCopyLink:()=>{}, onMute:()=>{},
+  }));
+  ok(gScore.includes('data-who="me">4</span>') && gScore.includes('data-who="them">2</span>'),
+     'host view: own score 4, opponent 2');
+  const gScoreGuest = renderToString(React.createElement(GameScreen, {
+    S, role:'guest', name:'Mina', avatar:2, muted:false,
+    hostName:'Rahim', guestName:'Mina', hostAvatar:0, guestAvatar:2,
+    connected:true, lost:false, roomCode:'ABC123', roomLink:'http://x/?join=ABC123',
+    onCardTap:()=>{}, onGoHome:()=>{}, onRematch:()=>{}, onRetry:()=>{}, onCopyLink:()=>{}, onMute:()=>{},
+  }));
+  ok(gScoreGuest.includes('data-who="me">2</span>') && gScoreGuest.includes('data-who="them">4</span>'),
+     'guest view: own score 2, opponent 4');
+  S.scores = { 1:0, 2:0 };
+
   const h = renderToString(React.createElement(HostScreen, {
     name:'Badhon', avatar:0,
     roomCode:'ABC123', roomLink:'http://x/?join=ABC123', sizePairs:8,
