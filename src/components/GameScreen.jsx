@@ -15,6 +15,7 @@ export default function GameScreen({
   S, role, name, avatar, muted, hostName, guestName, hostAvatar, guestAvatar,
   connected, lost, roomCode, roomLink,
   onCardTap, onGoHome, onRematch, onRetry, onCopyLink, onMute,
+  rematchReq, rematchSent, onAcceptRematch, onDeclineRematch,
 }){
   const isHost = role==='host';
   const myName = (isHost ? name : guestName) || (isHost ? 'Player 1' : 'Player 2');
@@ -112,6 +113,8 @@ export default function GameScreen({
           myAvatar={meAv} theirAvatar={themAv}
           onRematch={onRematch} onGoHome={onGoHome}
           roomCode={roomCode} roomLink={roomLink} onCopyLink={onCopyLink}
+          rematchReq={rematchReq} rematchSent={rematchSent}
+          onAcceptRematch={onAcceptRematch} onDeclineRematch={onDeclineRematch}
         />
       )}
     </div>

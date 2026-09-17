@@ -162,12 +162,17 @@ try{
   ok(H().view.scores[1]===G().view.scores[1] && H().view.scores[2]===G().view.scores[2], 'scores agree on both');
   ok(H().view.scores[1]+H().view.scores[2]===H().view.pairs, 'all pairs were found');
 
-  /* ── 7. rematch (guest asks, host rebuilds) ── */
+  /* ── 7. rematch (guest asks; host must APPROVE, never auto-starts) ── */
   await act(async()=>{ G().requestRematch(); });
-  await waitUntil(()=>H().view.phase==='play' && G().view.phase==='play', 'rematch starts');
+  await waitUntil(()=>H().rematchReq!=null, 'host notified of the rematch request');
+  ok(G().rematchSent===true, 'guest shows the request as pending');
+  ok(G().view.phase==='done' && H().view.phase==='done', 'no auto-restart: game still over before approval');
+  await act(async()=>{ H().acceptRematchReq(); });
+  await waitUntil(()=>H().view.phase==='play' && G().view.phase==='play', 'rematch starts after approval');
   ok(H().view.scores[1]===0 && H().view.scores[2]===0, 'rematch resets scores');
   ok(H().view.cards.every(c=>c.state==='down'), 'rematch board is fresh and face-down');
   ok(H().view.deck.join(',')===G().view.deck.join(','), 'guest received the new deck');
+  ok(G().rematchSent===false, 'guest pending flag cleared once the fresh board arrives');
 
   /* ── 8. guest leaves → host sees connection lost ── */
   const before = {

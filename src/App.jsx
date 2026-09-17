@@ -88,7 +88,11 @@ export default function App(){
           roomLink={g.roomLink()}
           onCardTap={g.onCardTap}
           onGoHome={g.goHome}
-          onRematch={g.role==='host' ? g.startRematch : g.requestRematch}
+          onRematch={g.role==='guest' ? g.requestRematch : g.acceptRematchReq}
+          rematchReq={g.rematchReq}
+          rematchSent={g.rematchSent}
+          onAcceptRematch={g.acceptRematchReq}
+          onDeclineRematch={g.declineRematchReq}
           onRetry={g.role==='guest' ? g.tryJoin : ()=>{}}
           onCopyLink={copyLink}
           onMute={g.toggleMute}

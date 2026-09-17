@@ -39,6 +39,8 @@ export function useDiliGame(){
   const [hostAvatar, setHostAvatar] = useState(null);
   const [guestAvatar, setGuestAvatar] = useState(null);
   const [roomCode, setRoomCode] = useState(null);
+  const [rematchReq, setRematchReq] = useState(null);   // host: guest asked for a rematch { name }
+  const [rematchSent, setRematchSent] = useState(false); // guest: my request is pending
   const [connected, setConnected] = useState(false);
   const [lost, setLost] = useState(false);
   const [joinErr, setJoinErr] = useState(null);
@@ -168,6 +170,7 @@ export function useDiliGame(){
   const startRematch = useCallback(()=>{
     if(roleRef.current!=='host') return;
     SRef.current = engineNewGame(SRef.current?.pairs || sizePairs);
+    setRematchReq(null);
     setLost(false);
     bump();
     if(connRef.current){
@@ -189,6 +192,7 @@ export function useDiliGame(){
       initRef.current = true;
       clearTimeout(joinTo.current);
       setLost(false);
+      setRematchSent(false);   // host approved; the fresh board is here
       setScreen('game');
       setConnected(true);
       sfx('join');
@@ -229,7 +233,10 @@ export function useDiliGame(){
       bump();
     }
     else if(m.t==='rematch-req' && r==='host'){
-      startRematch();
+      // never auto-restart: the guest notices, the HOST approves (so the
+      // winner can download/share the score card first)
+      setRematchReq(m);
+      bump();
     }
     else if(m.t==='bye'){
       setLost(true);
@@ -442,6 +449,8 @@ export function useDiliGame(){
     setLost(false);
     setJoinErr(null);
     setRoomCode(null);
+    setRematchReq(null);
+    setRematchSent(false);
     setHostName('');
     setGuestName('');
     setHostAvatar(null);
@@ -449,10 +458,16 @@ export function useDiliGame(){
     setScreen('menu');
   }, [releaseWake, stopTimerLoop]);
 
-  /* ── guest asks the host for a rematch ── */
-  const requestRematch = useCallback(()=>{
-    send(connRef.current, { t:'rematch-req' });
-  }, []);
+  /* ── guest: ask for a rematch (host approves; never auto-restart) ── */
+  const requestRematch = useCallback(async ()=>{
+    send(connRef.current, { t:'rematch-req', name:(guestNameRef.current || nameRef.current).slice(0,14) });
+    setRematchSent(true);
+    showToast('Rematch request sent');
+  }, [showToast]);
+
+  /* ── host: approve (or dismiss) a pending rematch request ── */
+  const acceptRematchReq = useCallback(()=>{ setRematchReq(null); startRematch(); }, [startRematch]);
+  const declineRematchReq = useCallback(()=> setRematchReq(null), []);
 
   /* ── mute  */
   const toggleMute = useCallback(()=>{
@@ -493,6 +508,7 @@ export function useDiliGame(){
     roomCode, roomLink,
     createGame, joinGame, tryJoin,
     onCardTap, goHome, startRematch, requestRematch, toggleMute,
+    rematchReq, rematchSent, acceptRematchReq, declineRematchReq,
     setLost, setJoinErr, showToast,
   };
 }

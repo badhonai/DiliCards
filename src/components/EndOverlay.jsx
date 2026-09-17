@@ -1,7 +1,7 @@
 import { CFG } from '../config.js';
 import { avatarUrl } from '../game/avatar.js';
 import ScorecardPicker from './ScorecardPicker.jsx';
-import { IconCopy, IconHome, IconRefresh, IconTrophy } from './Icons.jsx';
+import { IconClose, IconCopy, IconHome, IconRefresh, IconTrophy } from './Icons.jsx';
 import logo from '../assets/logo.png';
 import diliHappy from '../assets/dili-happy.png';
 import diliFunny from '../assets/dili-funny.png';
@@ -15,6 +15,7 @@ import diliCool from '../assets/dili-cool.png';
 export default function EndOverlay({
   S, isHost, myName, theirName, myAvatar, theirAvatar,
   onRematch, onGoHome, roomCode, roomLink, onCopyLink,
+  rematchReq, rematchSent, onAcceptRematch, onDeclineRematch,
 }){
   if(!S) return null;
   const w = S.winner;
@@ -56,9 +57,8 @@ export default function EndOverlay({
                 : <span className="sp-init">{(myName||'?')[0]}</span>}
             </span>
             <div className="fchip-main">
-              <span className="fchip-name">{myName} {isHost && <em>(you)</em>}</span>
-              {w===1 && isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
-              {w===2 && !isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
+              <span className="fchip-name">{myName} <em>(you)</em></span>
+              {iWon && <span className="fchip-crown"><IconTrophy size={13}/></span>}
             </div>
             <span className="fchip-score">{myScore}</span>
           </div>
@@ -69,9 +69,8 @@ export default function EndOverlay({
                 : <span className="sp-init">{(theirName||'?')[0]}</span>}
             </span>
             <div className="fchip-main">
-              <span className="fchip-name">{theirName} {!isHost && <em>(you)</em>}</span>
-              {w===1 && !isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
-              {w===2 && isHost && <span className="fchip-crown"><IconTrophy size={13}/></span>}
+              <span className="fchip-name">{theirName}</span>
+              {!iWon && <span className="fchip-crown"><IconTrophy size={13}/></span>}
             </div>
             <span className="fchip-score">{theirScore}</span>
           </div>
@@ -99,20 +98,27 @@ export default function EndOverlay({
           )
         ) : (
           <div className="rematch-nudge">
-            <div className="rn-title">Rematch?</div>
-            <div className="rn-sub">Ask <b>{winnerName}</b> to rematch, or start your own room.</div>
+            <div className="rn-title">{rematchSent ? 'Rematch requested' : 'Rematch?'}</div>
+            <div className="rn-sub">
+              {rematchSent
+                ? <>Waiting for <b>{winnerName}</b> to accept…</>
+                : <>Ask <b>{winnerName}</b> to rematch, or start your own room.</>}
+            </div>
           </div>
         )}
 
         <div className="btn-row spread">
-          {isDraw ? (
-            isHost
-              ? <button className="btn primary" onClick={onRematch}><IconRefresh size={17}/> Rematch</button>
-              : <button className="btn primary" onClick={onRematch}><IconRefresh size={17}/> Ask for rematch</button>
+          {isHost && rematchReq ? (
+            <>
+              <button className="btn primary" onClick={onAcceptRematch}><IconRefresh size={17}/> Accept rematch</button>
+              <button className="btn" onClick={onDeclineRematch}><IconClose size={17}/> Not now</button>
+            </>
+          ) : !isHost && rematchSent ? (
+            <button className="btn primary" disabled><IconRefresh size={17}/> Request sent…</button>
+          ) : isHost ? (
+            <button className="btn primary" onClick={onAcceptRematch}><IconRefresh size={17}/> Rematch</button>
           ) : (
-            isHost
-              ? <button className="btn primary" onClick={onRematch}><IconRefresh size={17}/> Rematch</button>
-              : <button className="btn primary" onClick={onRematch}><IconRefresh size={17}/> Ask for rematch</button>
+            <button className="btn primary" onClick={onRematch}><IconRefresh size={17}/> Ask for rematch</button>
           )}
           <button className="btn" onClick={onGoHome}><IconHome size={17}/> Home</button>
         </div>
