@@ -112,7 +112,8 @@ try{
     onRematch:()=>{}, onGoHome:()=>{}, roomCode:'ABC123', roomLink:'x', onCopyLink:()=>{},
   }));
   ok(e.includes('You win!'), 'win overlay title');
-  ok(e.includes('Your champion postcards'), 'postcard picker shown for winner');
+  ok(!e.includes('Your champion postcards'), 'postcards hidden while design approval pending');
+  ok(e.includes('Champion postcards'), 'winner sees the coming-soon nudge instead');
 
   S.phase='done'; S.winner=2;
   const eLose = renderToString(React.createElement(EndOverlay, {
@@ -121,7 +122,7 @@ try{
     onRematch:()=>{}, onGoHome:()=>{}, roomCode:'ABC123', roomLink:'x', onCopyLink:()=>{},
   }));
   ok(eLose.includes('Rahim wins'), 'loss overlay title');
-  ok(!eLose.includes('Your champion postcards'), 'no postcards for the loser');
+  ok(!eLose.includes('coming soon'), 'loser sees no postcard nudge');
 
   S.phase='done'; S.winner=0; S.scores={1:3,2:3};
   const eTie = renderToString(React.createElement(EndOverlay, {

@@ -1,3 +1,4 @@
+import { CFG } from '../config.js';
 import { avatarUrl } from '../game/avatar.js';
 import PostcardPicker from './PostcardPicker.jsx';
 import { IconCopy, IconHome, IconRefresh, IconTrophy } from './Icons.jsx';
@@ -71,12 +72,19 @@ export default function EndOverlay({
         </div>
 
         {isDraw ? null : iWon ? (
-          <PostcardPicker
-            winnerName={winnerName}
-            winnerAvatar={winnerAvatar}
-            score={winScore}
-            pairs={S.pairs}
-          />
+          CFG.POSTCARDS_ENABLED ? (
+            <PostcardPicker
+              winnerName={winnerName}
+              winnerAvatar={winnerAvatar}
+              score={winScore}
+              pairs={S.pairs}
+            />
+          ) : (
+            <div className="rematch-nudge">
+              <div className="rn-title">Champion postcards</div>
+              <div className="rn-sub">Shareable win cards are coming soon — for now, rematch and defend your crown.</div>
+            </div>
+          )
         ) : (
           <div className="rematch-nudge">
             <div className="rn-title">Rematch?</div>
