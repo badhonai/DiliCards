@@ -145,6 +145,30 @@ try{
   }));
   ok(eLose.includes('Rahim wins'), 'loss overlay title');
   ok(!eLose.includes('Winner score card'), 'loser sees no score card (winner-only)');
+  ok(eLose.includes('Ask <b>Rahim</b>'), 'loser rematch nudge names the actual winner (Rahim)');
+
+  // guest WINS, viewed by the guest → 'You win!' and their own name as winner
+  S.winner=2; S.scores={1:1,2:4};
+  const eGuestWin = renderToString(React.createElement(EndOverlay, {
+    S, isHost:false, myName:'Mina', theirName:'Rahim',
+    myAvatar:2, theirAvatar:0,
+    onRematch:()=>{}, onGoHome:()=>{}, roomCode:'ABC123', roomLink:'x', onCopyLink:()=>{},
+  }));
+  ok(eGuestWin.includes('You win!'), 'guest winner sees You win');
+  ok(eGuestWin.includes('Winner score card'), 'guest winner sees the score card');
+  ok(!eGuestWin.includes('Rahim wins'), 'guest winner title never names the loser');
+  ok(!eGuestWin.includes('Ask <b>Mina</b>'), 'guest winner rematch nudge never names self as un-winner');
+
+  // host WINS, viewed by the guest (loser) → winner name = host's name
+  S.winner=1; S.scores={1:5,2:2};
+  const eGuestLose = renderToString(React.createElement(EndOverlay, {
+    S, isHost:false, myName:'Mina', theirName:'Rahim',
+    myAvatar:2, theirAvatar:0,
+    onRematch:()=>{}, onGoHome:()=>{}, roomCode:'ABC123', roomLink:'x', onCopyLink:()=>{},
+  }));
+  ok(eGuestLose.includes('Rahim wins'), 'guest loser sees host name as winner');
+  ok(eGuestLose.includes('Ask <b>Rahim</b>'), 'guest loser rematch nudge names host');
+  ok(!eGuestLose.includes('Winner score card'), 'guest loser sees no score card');
 
   S.phase='done'; S.winner=0; S.scores={1:3,2:3};
   const eTie = renderToString(React.createElement(EndOverlay, {

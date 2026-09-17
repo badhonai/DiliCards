@@ -74,7 +74,7 @@ export default function GameScreen({
           </span>
           <div className="sc-main">
             <span className="sc-name">{myName} <em>(you)</em></span>
-            <span className="sc-label">{!notMyTurn ? 'your turn, flip 2' : 'waiting'}</span>
+            <span className="sc-label">{S.phase==='locked' ? 'flipping back…' : !notMyTurn ? 'your turn, flip 2' : 'waiting'}</span>
           </div>
           <span className={'sc-score mine' + (!notMyTurn ? ' live' : '')} data-who="me">{myScore}</span>
         </div>

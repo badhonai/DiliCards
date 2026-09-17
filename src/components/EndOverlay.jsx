@@ -26,13 +26,16 @@ export default function EndOverlay({
   const iWon = (w===1 && isHost) || (w===2 && !isHost);
   const isDraw = w===0;
 
-  const winnerIsHost = w===1;
-  const winnerName = winnerIsHost ? myName : theirName;
-  const winnerAvatar = winnerIsHost ? myAvatar : theirAvatar;
-  const loserName = winnerIsHost ? theirName : myName;
-  const loserAvatar = winnerIsHost ? theirAvatar : myAvatar;
-  const winScore = winnerIsHost ? hostScore : guestScore;
-  const loseScore = winnerIsHost ? guestScore : hostScore;
+  // winner/loser are resolved by ROLE (myName/theirName is already relative to
+  // the viewer), never by blindly mapping winner 1/2 onto my/their.
+  const winnerName = iWon ? myName : theirName;
+  const winnerAvatar = iWon ? myAvatar : theirAvatar;
+  const loserName = iWon ? theirName : myName;
+  const loserAvatar = iWon ? theirAvatar : myAvatar;
+  // scores stay absolute (host = scores[1], guest = scores[2]) regardless of who views
+  const hostWon = w===1;
+  const winScore = hostWon ? hostScore : guestScore;
+  const loseScore = hostWon ? guestScore : hostScore;
 
   const mascot = isDraw ? diliFunny : (iWon ? diliHappy : diliCool);
 
