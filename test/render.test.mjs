@@ -23,10 +23,24 @@ try{
   const { default: App } = await server.ssrLoadModule('/src/App.jsx');
   const menu = renderToString(React.createElement(App));
   ok(menu.includes('DiliCards'), 'App renders menu with logo');
-  ok(menu.includes('Create a game'), 'menu has create button');
+  ok(menu.includes('Create game'), 'menu has create action card');
+  ok(menu.includes('Join a game'), 'menu has join action card');
+  ok(menu.includes('YOUR NAME') && menu.includes('Type your name'), 'menu shows mandatory name field');
+  ok(menu.includes('required (2+ letters)'), 'menu explains name is required (no saved name)');
+  ok(menu.includes('disabled'), 'create card disabled until a name exists');
   ok(menu.includes('Follow'), 'menu has X follow button');
   ok(menu.includes('dilicard.badhon.online'), 'menu shows site link');
   ok(menu.includes('Easy') && menu.includes('Hard'), 'board size chips render');
+  ok(menu.includes('reroll'), 'avatar reroll button present');
+
+  // pending-join banner (opened a ?join= link without a saved name)
+  const { default: MenuScreen } = await server.ssrLoadModule('/src/components/MenuScreen.jsx');
+  const pending = renderToString(React.createElement(MenuScreen, {
+    name:'', setName:()=>{}, sizePairs:8, setSizePairs:()=>{},
+    avatar:0, onReroll:()=>{}, pendingJoin:'ABC123',
+    onCreate:()=>{}, onJoin:()=>{},
+  }));
+  ok(pending.includes('joining room') && pending.includes('ABC123'), 'pending-join banner shows the room code');
 
   const { default: HostScreen } = await server.ssrLoadModule('/src/components/HostScreen.jsx');
   const { default: JoinScreen } = await server.ssrLoadModule('/src/components/JoinScreen.jsx');

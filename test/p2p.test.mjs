@@ -69,7 +69,13 @@ await pump(30);
 const H = ()=>hostG.g, G = ()=>guestG.g;   // always read the latest hook object
 
 try{
+  /* ── 0. name is mandatory ── */
+  await act(async()=>{ H().createGame(); });
+  ok(H().screen==='menu', 'create without a name is refused');
+  ok(typeof H().avatar==='number' && H().avatar>=0 && H().avatar<4, 'device got a random Dili avatar (0-3)');
+
   /* ── 1. host creates a room ── */
+  await act(async()=>{ H().setName('Host1'); });
   await act(async()=>{ H().createGame(); });
   ok(H().screen==='host' && /^[A-Z2-9]{6}$/.test(H().roomCode), 'host on waiting screen with 6-char code');
   ok(H().roomLink().includes('?join='+H().roomCode), 'shareable join link built');
@@ -77,12 +83,17 @@ try{
   /* ── 2. guest joins ── */
   const code = H().roomCode;
   await act(async()=>{ G().joinGame(code); });
+  ok(G().screen==='menu', 'join without a name is refused (stays on menu)');
+  await act(async()=>{ G().setName('Guest1'); });
+  await act(async()=>{ G().joinGame(code); });
   ok(G().screen==='join', 'guest on joining screen');
 
   await waitUntil(()=>H().screen==='game' && G().screen==='game', 'both phones in the game');
   ok(true, 'connection established → both phones show the board');
   ok(H().connected && G().connected, 'connection dot green on both');
-  ok(G().hostName===H().hostName, 'guest sees host name');
+  ok(G().hostName===H().hostName && H().guestName==='Guest1', 'names exchanged both ways');
+  ok(typeof G().hostAvatar==='number', 'guest received host avatar');
+  ok(typeof H().guestAvatar==='number', 'host received guest avatar');
   ok(H().view.deck.join(',')===G().view.deck.join(','), 'guest got the same deck');
   ok(G().view.cards.every(c=>c.state==='down'), 'guest board starts face-down');
   ok(H().view.turn===1, 'host (Player 1) goes first');
@@ -158,10 +169,31 @@ try{
   ok(H().view.deck.join(',')===G().view.deck.join(','), 'guest received the new deck');
 
   /* ── 8. guest leaves → host sees connection lost ── */
+  const before = {
+    phase: H().view.phase,
+    s1: H().view.scores[1], s2: H().view.scores[2],
+    deck: H().view.deck.join(','),
+  };
   await act(async()=>{ G().goHome(); });
   await waitUntil(()=>H().lost===true, 'host notified friend left');
   ok(G().screen==='menu', 'guest back at menu');
   ok(true, 'bye → host connection-lost overlay');
+
+  /* ── 8b. a guest RE-JOINS the same room (reconnect, no new room) ── */
+  const g2 = {};
+  const g2Root = create(React.createElement(Driver, { register:g=>{ g2.g=g; } }));
+  await pump(30);
+  await act(async()=>{ g2.g.setName('Guest1'); });
+  await act(async()=>{ g2.g.joinGame(code); });
+  await waitUntil(()=>g2.g.screen==='game' && H().connected, 'rejoined guest in the game');
+  await waitUntil(()=>g2.g.view && g2.g.view.phase===before.phase && g2.g.view.deck.join(',')===before.deck,
+    'rejoin sync applied');
+  ok(H().lost===false, 'host: rejoin clears the lost overlay');
+  ok(g2.g.view.scores[1]===before.s1 && g2.g.view.scores[2]===before.s2,
+     'rejoin delivers the CURRENT state (not a reset board)');
+  await act(async()=>{ g2.g.goHome(); });
+  await waitUntil(()=>H().lost===true, 'host notified again on second leave');
+  g2Root.unmount();
 
   /* ── 9. joining a room that does not exist ── */
   await act(async()=>{ G().joinGame('ZZZZ99'); });

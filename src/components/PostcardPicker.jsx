@@ -9,12 +9,12 @@ import {
  * Victory postcards: 3 style variants rendered on <canvas>.
  * Pick one → Download PNG, native Share, or post straight to X.
  */
-export default function PostcardPicker({ names, scores, isTie, winnerName }){
+export default function PostcardPicker({ names, scores, isTie, winnerName, avatarUrl }){
   const [thumbs, setThumbs] = useState({});
   const [sel, setSel] = useState(VARIANTS[0].id);
   const [busy, setBusy] = useState(false);
 
-  const base = { names, scores, isTie, winnerName };
+  const base = { names, scores, isTie, winnerName, avatarUrl };
 
   useEffect(()=>{
     let alive = true;

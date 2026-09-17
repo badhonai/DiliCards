@@ -1,10 +1,15 @@
 import { CFG } from '../config.js';
+import { avatarUrl } from '../game/avatar.js';
 import Board from './Board.jsx';
 
-function ScorePill({ p, name, score, active, you }){
+function ScorePill({ p, name, score, active, you, avatar }){
   return (
     <div className={`score s${p}${active ? ' active' : ''}`}>
-      <div className="ball">{String(name || p).slice(0,1).toUpperCase()}</div>
+      <div className="ball">
+        {avatar!=null
+          ? <img src={avatarUrl(avatar)} alt=""/>
+          : String(name || p).slice(0,1).toUpperCase()}
+      </div>
       <div className="meta">
         <div className="who">
           <span className="who-name">{name}</span>
@@ -43,18 +48,20 @@ function turnText(view, me, oppName){
  */
 export default function GameScreen({
   view, role, hostName, guestName,
+  avatar, hostAvatar, guestAvatar,
   connected, muted, onCardTap, onHome, onMute,
 }){
   const me = role==='host' ? 1 : 2;
   const opp = me===1 ? 2 : 1;
   const myName = me===1 ? (hostName || 'Player 1') : (guestName || 'Player 2');
   const oppName = me===1 ? (guestName || 'Player 2') : (hostName || 'Player 1');
+  const oppAvatar = me===1 ? guestAvatar : hostAvatar;
   const matched = view.cards.filter(c=>c.state==='matched').length;
 
   return (
     <div className="game-screen">
       <div className="hud hud-top">
-        <ScorePill p={opp} name={oppName} score={view.scores[opp]}
+        <ScorePill p={opp} name={oppName} score={view.scores[opp]} avatar={oppAvatar}
           active={view.phase==='play' && view.turn===opp}/>
       </div>
 
@@ -71,7 +78,7 @@ export default function GameScreen({
       <Board S={view} onCardTap={onCardTap}/>
 
       <div className="hud hud-bottom">
-        <ScorePill p={me} name={myName} score={view.scores[me]}
+        <ScorePill p={me} name={myName} score={view.scores[me]} avatar={avatar}
           active={view.phase==='play' && view.turn===me} you/>
         <div className="hud-btns">
           <button className="round-btn" onClick={onMute} aria-label="mute">{muted ? '🔇' : '🔊'}</button>

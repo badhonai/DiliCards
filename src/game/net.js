@@ -15,6 +15,18 @@ export function send(conn, obj){
 }
 
 /**
+ * Wire a one-shot 'open' callback.
+ * PeerJS race: the connection can ALREADY be open by the time we attach
+ * the listener — then 'open' would never fire and the peer would wait
+ * forever. Check state first, always.
+ */
+function wireOpen(conn, fn){
+  if(!conn) return;
+  if(conn.open) fn();
+  else conn.on('open', fn);
+}
+
+/**
  * Host a room.
  * handlers: { onOpen, onFriend(conn), onData(conn,msg), onFriendLost(conn), onPeerError(err) }
  */
@@ -25,7 +37,7 @@ export function createHost(code, h={}){
   };
   peer.on('open', ()=>h.onOpen?.());
   peer.on('connection', conn=>{
-    conn.on('open', ()=>h.onFriend?.(conn));
+    wireOpen(conn, ()=>h.onFriend?.(conn));
     conn.on('data', d=>h.onData?.(conn,d));
     const lost=()=>h.onFriendLost?.(conn);
     conn.on('close', lost);
@@ -47,7 +59,7 @@ export function createGuest(code, h={}){
   };
   peer.on('open', ()=>{
     const conn=peer.connect(CFG.PREFIX+code, { reliable:true });
-    conn.on('open', ()=>h.onOpen?.(conn));
+    wireOpen(conn, ()=>h.onOpen?.(conn));
     conn.on('data', d=>h.onData?.(conn,d));
     const lost=()=>h.onLost?.(conn);
     conn.on('close', lost);

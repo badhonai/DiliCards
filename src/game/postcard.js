@@ -63,6 +63,28 @@ function fitFont(ctx, text, family, weight, startSize, maxWidth){
   return size;
 }
 
+/**
+ * Geometry of the winner-name line (avatar circle + fitted name),
+ * shared by the text pass (renderPostcard) and the avatar pass
+ * (postcardToCanvas draws the image on top).
+ */
+function nameGeometry(ctx, disp, hasAv){
+  const W=POSTCARD_W, H=POSTCARD_H, cx=W/2;
+  const av = hasAv ? 120 : 0;
+  const gap = hasAv ? 28 : 0;
+  const ns = fitFont(ctx, disp, FONT, '900', 118, W-160 - (av?av+gap:0));
+  ctx.font=`900 ${ns}px ${FONT}`;
+  const nameW=ctx.measureText(disp).width;
+  const startX=cx-(av+gap+nameW)/2;
+  return {
+    disp, ns, av, gap, startX,
+    nameX: startX+av+gap,
+    baseY: H*0.775,
+    avCx: startX+av/2,
+    avCy: H*0.775 - ns*0.34,
+  };
+}
+
 const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 
 /** Draw a postcard onto `canvas`. */
@@ -112,12 +134,14 @@ export function renderPostcard(canvas, opts){
   ctx.fillStyle=v.accentInk;
   ctx.fillText(banner, cx, by+bh/2+30);
 
-  // ── winner name
+  // ── winner name (avatar circle is drawn on top by postcardToCanvas)
   const disp=(isTie ? 'Tied Game' : (winnerName || 'Winner')).slice(0,20);
-  const ns=fitFont(ctx, disp, FONT, '900', 118, W-160);
+  const ng=nameGeometry(ctx, disp, !!opts.avatarUrl);
   ctx.fillStyle=v.ink;
-  ctx.font=`900 ${ns}px ${FONT}`;
-  ctx.fillText(disp, cx, H*0.775);
+  ctx.font=`900 ${ng.ns}px ${FONT}`;
+  ctx.textAlign='left';
+  ctx.fillText(disp, ng.nameX, ng.baseY);
+  ctx.textAlign='center';
 
   // ── score line
   ctx.font=`900 104px ${FONT}`;
@@ -155,11 +179,15 @@ function loadImage(src){
 
 export async function postcardToCanvas(opts){
   const artUrl = opts.isTie ? diliFunny : diliHands;
-  const [img] = await Promise.all([loadImage(artUrl)]);
+  const [img, avImg] = await Promise.all([
+    loadImage(artUrl),
+    opts.avatarUrl ? loadImage(opts.avatarUrl) : Promise.resolve(null),
+  ]);
   const canvas=document.createElement('canvas');
   renderPostcard(canvas, opts);
-  // draw sticker on top (after base render so it sits over the circle)
   const ctx=canvas.getContext('2d');
+
+  // big sticker on top (after base render so it sits over the circle)
   const cx=POSTCARD_W/2, cy=POSTCARD_H*0.40;
   const s=430;
   ctx.save();
@@ -167,6 +195,20 @@ export async function postcardToCanvas(opts){
   ctx.shadowBlur=40; ctx.shadowOffsetY=18;
   ctx.drawImage(img, cx-s/2, cy-s/2, s, s);
   ctx.restore();
+
+  // winner's avatar circle, left of their name
+  if(avImg && opts.avatarUrl){
+    const disp=(opts.isTie ? 'Tied Game' : (opts.winnerName||'Winner')).slice(0,20);
+    const ng=nameGeometry(ctx, disp, true);
+    const r=ng.av/2;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(ng.avCx, ng.avCy, r, 0, Math.PI*2); ctx.clip();
+    ctx.drawImage(avImg, ng.avCx-r*1.12, ng.avCy-r*1.12, r*2.24, r*2.24);
+    ctx.restore();
+    ctx.lineWidth=8;
+    ctx.strokeStyle='rgba(255,255,255,0.9)';
+    ctx.beginPath(); ctx.arc(ng.avCx, ng.avCy, r+5, 0, Math.PI*2); ctx.stroke();
+  }
   return canvas;
 }
 

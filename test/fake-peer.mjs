@@ -33,9 +33,10 @@ function connectFlow(localPeer, id){
     const remoteConn = new FakeConn();
     local.remote = remoteConn; remoteConn.remote = local;
     remotePeer._conns.push(remoteConn);
-    fire(remotePeer,'connection',remoteConn);
-    local.open = true;  fire(local,'open');
-    remoteConn.open = true; fire(remoteConn,'open');
+    fire(remotePeer,'connection',remoteConn);   // host wires listeners first
+    local.open = true; remoteConn.open = true;  // then both ends are open (real PeerJS order)
+    fire(local,'open');
+    fire(remoteConn,'open');
   }, 0);
   return local;
 }

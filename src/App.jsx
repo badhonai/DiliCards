@@ -37,6 +37,9 @@ export default function App(){
           setName={g.setName}
           sizePairs={g.sizePairs}
           setSizePairs={g.setSizePairs}
+          avatar={g.avatar}
+          onReroll={g.rerollAvatar}
+          pendingJoin={g.pendingJoin}
           onCreate={g.createGame}
           onJoin={g.joinGame}
         />
@@ -46,6 +49,8 @@ export default function App(){
         <HostScreen
           roomCode={g.roomCode}
           roomLink={g.roomLink()}
+          hostName={g.hostName}
+          avatar={g.avatar}
           onCopy={copyLink}
           onShare={()=>shareText(`Play ${CFG.GAME_NAME} with me! Join code: ${g.roomCode}`, g.roomLink())}
           onCancel={g.goHome}
@@ -56,6 +61,8 @@ export default function App(){
         <JoinScreen
           roomCode={g.roomCode}
           joinErr={g.joinErr}
+          guestName={g.guestName}
+          avatar={g.avatar}
           onRetry={g.tryJoin}
           onCancel={g.goHome}
         />
@@ -68,6 +75,9 @@ export default function App(){
             role={g.role}
             hostName={g.hostName}
             guestName={g.guestName}
+            avatar={g.avatar}
+            hostAvatar={g.hostAvatar}
+            guestAvatar={g.guestAvatar}
             connected={g.connected}
             muted={g.muted}
             onCardTap={g.onCardTap}
@@ -80,6 +90,9 @@ export default function App(){
               role={g.role}
               hostName={g.hostName}
               guestName={g.guestName}
+              avatar={g.avatar}
+              hostAvatar={g.hostAvatar}
+              guestAvatar={g.guestAvatar}
               onRematch={g.startRematch}
               onRematchReq={g.requestRematch}
               onHome={g.goHome}
