@@ -1,10 +1,10 @@
 /**
  * ─────────────────────────────────────────────────────────────
- *  DILICARDS — P2P session (PeerJS over WebRTC)
+ *  DILICARDS  -  P2P session (PeerJS over WebRTC)
  *
  *  The host registers a room id; the guest connects to it.
  *  After the (free) PeerJS cloud introduces the two phones,
- *  ALL game data flows directly between the phones — no server.
+ *  ALL game data flows directly between the phones  -  no server.
  * ─────────────────────────────────────────────────────────────
  */
 import Peer from 'peerjs';
@@ -17,7 +17,7 @@ export function send(conn, obj){
 /**
  * Wire a one-shot 'open' callback.
  * PeerJS race: the connection can ALREADY be open by the time we attach
- * the listener — then 'open' would never fire and the peer would wait
+ * the listener  -  then 'open' would never fire and the peer would wait
  * forever. Check state first, always.
  */
 function wireOpen(conn, fn){

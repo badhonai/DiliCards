@@ -1,5 +1,5 @@
 /**
- * DILICARDS — tiny inline SVG icon set (replaces all emoji in the UI).
+ * DILICARDS  -  tiny inline SVG icon set (replaces all emoji in the UI).
  * 24×24 stroke icons, inherit currentColor.
  */
 function I({ size=20, children, ...rest }){

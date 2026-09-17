@@ -1,8 +1,8 @@
 /**
- * DILICARDS — player avatars
+ * DILICARDS  -  player avatars
  * The player picks one of the Dili stickers (first-launch popup, or
  * tap the avatar later). The choice is saved to localStorage.
- * No auto-random — the choice is always the user's.
+ * No auto-random  -  the choice is always the user's.
  */
 import diliCool from '../assets/dili-cool.png';
 import diliFunny from '../assets/dili-funny.png';

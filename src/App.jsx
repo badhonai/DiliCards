@@ -11,7 +11,7 @@ import { CFG } from './config.js';
 async function shareText(text, url){
   if(navigator.share){
     try{ await navigator.share({ title:CFG.GAME_NAME, text, url }); return; }
-    catch(e){ /* cancelled — fall through to copy */ }
+    catch(e){ /* cancelled  -  fall through to copy */ }
   }
   try{ await navigator.clipboard.writeText(text + ' ' + url); }
   catch(e){ /* no clipboard */ }

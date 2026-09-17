@@ -1,5 +1,5 @@
 /**
- * DILICARDS — tiny WebAudio sound effects (no audio files needed).
+ * DILICARDS  -  tiny WebAudio sound effects (no audio files needed).
  * All effects are synthesized, so the game stays a single deploy.
  */
 let actx=null;

@@ -1,5 +1,5 @@
 /**
- * DILICARDS — winner score cards (shareable, winner-only)
+ * DILICARDS  -  winner score cards (shareable, winner-only)
  *
  * Two 16:9 backgrounds (approved by the owner: "Hero" and "Banner"),
  * each with its own layout. The canvas composes, per variant:
@@ -20,13 +20,13 @@ import scHero   from '../assets/scorecards/sc-hero.jpg';
 import scBanner from '../assets/scorecards/sc-banner.jpg';
 
 export const SCORECARD_VARIANTS = [
-  { id:'hero',   name:'Hero',   w:1920, h:1080, bg:scHero },
-  { id:'banner', name:'Banner', w:1920, h:1080, bg:scBanner },
+  { id:'hero',   name:'Preset A', w:1920, h:1080, bg:scHero },
+  { id:'banner', name:'Preset B', w:1920, h:1080, bg:scBanner },
 ];
 
 /** Default tweet caption (short link that redirects to the main site). */
 export function tweetText(score){
-  return `I just won a DiliCards memory duel — ${score} pairs found! Can you beat me? Challenge me live on two phones: https://dilicard.vercel.app`;
+  return `I just won a DiliCards memory duel, ${score} pairs found! Can you beat me? Challenge me live on two phones at https://dilicard.vercel.app`;
 }
 
 const INK   = '#4a2f1d';

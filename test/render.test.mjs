@@ -115,7 +115,7 @@ try{
   ok(e.includes('Winner score card'), 'winner sees the shareable score card');
   ok(e.includes('Share on X'), 'score card has an X share button');
   ok(e.includes('Show opponent name'), 'score card offers the hide-opponent toggle');
-  ok(e.includes('Hero') && e.includes('Banner'), 'score card offers both approved backgrounds');
+  ok(e.includes('Preset A') && e.includes('Preset B'), 'score card offers both approved backgrounds');
 
   S.phase='done'; S.winner=2;
   const eLose = renderToString(React.createElement(EndOverlay, {

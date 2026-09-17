@@ -3,7 +3,7 @@ import logo from '../assets/logo.png';
 import { IconCopy, IconRefresh } from './Icons.jsx';
 
 const ERR_TEXT = {
-  nohost:  "No live room found with that code — double-check it, or ask the host to copy a fresh link.",
+  nohost:  "No live room found with that code. Double-check it, or ask the host to copy a fresh link.",
   network: "Couldn't reach the matchmaking service. Check your connection and retry.",
   timeout: "The room isn't responding right now. Try again in a few seconds.",
   hostgone:"The host closed the game. Ask them to create a fresh room and send you the new link.",
@@ -12,7 +12,7 @@ const ERR_TEXT = {
 
 /**
  * The "joining a friend's room" screen (guest).
- * Shows what's being joined and gives real, readable errors —
+ * Shows what's being joined and gives real, readable errors  - 
  * never an endless spinner.
  */
 export default function JoinScreen({ name, avatar, roomCode, connected, onGoHome, onRetry, onCopyLink, err }){
@@ -68,8 +68,8 @@ export default function JoinScreen({ name, avatar, roomCode, connected, onGoHome
         )}
 
         <div className="hint">
-          Tip: have the host send you the <b>link</b> instead of the code —
-          it opens and joins automatically.
+          Tip: have the host send you the <b>link</b> instead of the code.
+          It opens and joins automatically.
         </div>
 
         <button className="btn ghost" onClick={onGoHome}>Cancel</button>

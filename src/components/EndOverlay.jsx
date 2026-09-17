@@ -84,18 +84,18 @@ export default function EndOverlay({
           ) : CFG.POSTCARDS_ENABLED ? (
             <div className="rematch-nudge">
               <div className="rn-title">Champion postcards</div>
-              <div className="rn-sub">Shareable win cards are coming soon — for now, rematch and defend your crown.</div>
+              <div className="rn-sub">Shareable win cards are coming soon. For now, rematch and defend your crown.</div>
             </div>
           ) : (
             <div className="rematch-nudge">
               <div className="rn-title">Champion postcards</div>
-              <div className="rn-sub">Shareable win cards are coming soon — for now, rematch and defend your crown.</div>
+              <div className="rn-sub">Shareable win cards are coming soon. For now, rematch and defend your crown.</div>
             </div>
           )
         ) : (
           <div className="rematch-nudge">
             <div className="rn-title">Rematch?</div>
-            <div className="rn-sub">Ask <b>{winnerName}</b> to rematch — or start your own room.</div>
+            <div className="rn-sub">Ask <b>{winnerName}</b> to rematch, or start your own room.</div>
           </div>
         )}
 

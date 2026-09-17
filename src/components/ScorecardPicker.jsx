@@ -80,7 +80,7 @@ export default function ScorecardPicker({
       window.open(
         'https://x.com/intent/tweet?text=' + encodeURIComponent(text),
         '_blank', 'noopener,noreferrer');
-      say('X opened — save the card and attach it to your post');
+      say('X opened. Save the card and attach it to your post.');
     } finally {
       setBusy(false);
     }
@@ -130,7 +130,7 @@ export default function ScorecardPicker({
         </button>
       </div>
       <div className="sc-hint">
-        Share on X opens a ready post with your caption — download the card and attach it to the post.
+        Share on X opens a ready post with your caption. Download the card and attach it to the post.
       </div>
       {toast && <div className="pc-toast">{toast}</div>}
     </div>

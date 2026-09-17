@@ -17,7 +17,7 @@ export default function HostScreen({ name, avatar, roomCode, roomLink, sizePairs
           <img className="logo-img sm" src={logo} alt=""/>
           <div>
             <div className="host-title">Your room is live</div>
-            <div className="host-sub">Share the code or the link — play begins the moment they open it.</div>
+            <div className="host-sub">Share the code or the link. Play begins the moment they open it.</div>
           </div>
         </div>
 
@@ -51,7 +51,7 @@ export default function HostScreen({ name, avatar, roomCode, roomLink, sizePairs
           <img src={diliFunny} alt="Dili waiting"/>
           <div className="mascot-text">
             <b>Pro tip:</b> {sizePairs*2} cards ({sizePairs} pairs) · 10s per turn ·
-            share the link — your friend auto-joins, no typing needed.
+            share the link and your friend auto-joins, no typing needed.
           </div>
         </div>
 

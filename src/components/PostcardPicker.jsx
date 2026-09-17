@@ -45,7 +45,7 @@ export default function PostcardPicker({ winnerName, winnerAvatar, score, pairs 
         window.open('https://x.com/intent/tweet?text=' +
           encodeURIComponent(`I won DiliCards with ${score} pairs! Can you beat me? https://dilicard.badhon.online`),
           '_blank', 'noopener');
-        say('Image saved — paste it into the tweet');
+        say('Image saved. Paste it into the tweet.');
       }
     } catch(e){ /* user cancelled */ }
     setBusy(0);

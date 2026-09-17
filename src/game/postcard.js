@@ -1,5 +1,5 @@
 /**
- * DILICARDS — winner postcards (pending design approval)
+ * DILICARDS  -  winner postcards (pending design approval)
  *
  * Six AI-generated backgrounds (3 square 1:1 + 3 wide 16:9, no text
  * baked in). The canvas composes, per variant:

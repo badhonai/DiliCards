@@ -1,6 +1,6 @@
 /**
  * ─────────────────────────────────────────────────────────────
- *  DILICARDS — central configuration
+ *  DILICARDS  -  central configuration
  *  Tweak the game (rules, names, links, board sizes) HERE.
  * ─────────────────────────────────────────────────────────────
  */
@@ -35,7 +35,7 @@ export const CFG = {
   STORE_KEY: 'dc-name',
 
   // Winner postcards: OFF until the owner approves a design.
-  // (Round 1 — 6 AI backgrounds in src/assets/postcards/ — was rejected:
+  // (Round 1  -  6 AI backgrounds in src/assets/postcards/  -  was rejected:
   //  "no one looks good. I will add it later." To ship: choose designs,
   //  update POSTCARD_VARIANTS in src/game/postcard.js, flip this to true.)
   POSTCARDS_ENABLED: false,

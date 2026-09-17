@@ -75,7 +75,7 @@ export default function MenuScreen({
           <div className="ac-icon"><IconGame size={26}/></div>
           <div className="ac-body">
             <div className="ac-title">Create game</div>
-            <div className="ac-sub">You're Player 1 (blue) — get a code & link to share</div>
+            <div className="ac-sub">You are Player 1. Get a code and a link to share.</div>
           </div>
           <div className="ac-arrow">→</div>
         </button>
@@ -104,7 +104,7 @@ export default function MenuScreen({
 
         {!canPlay && (
           <div className="pending-banner">
-            <IconUsers size={15}/> Tap your name above to pick a name & Dili — then create or join.
+            <IconUsers size={15}/> Tap your name above to pick a name and a Dili. Then create or join.
           </div>
         )}
 

@@ -15,7 +15,7 @@ export default function OnboardModal({ joinCode, initialName, initialAvatar, onS
     <div className="overlay onboard-overlay">
       <div className="panel onboard-panel">
         <h2 className="onboard-title">First time here?</h2>
-        <p className="onboard-sub">Pick a name and your Dili — saved on this phone, used in every match.</p>
+        <p className="onboard-sub">Pick a name and your Dili. It's saved on this phone and used in every match.</p>
 
         <div className="chip-label">YOUR NAME</div>
         <input
@@ -45,7 +45,7 @@ export default function OnboardModal({ joinCode, initialName, initialAvatar, onS
 
         {joinCode && (
           <div className="pending-banner">
-            Ready to join room <b>{joinCode}</b> — you'll go straight into the game.
+            Ready to join room <b>{joinCode}</b>. You'll go straight into the game.
           </div>
         )}
 

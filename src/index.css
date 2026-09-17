@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   DILICARDS — clay UI (mobile first)
+   DILICARDS  -  clay UI (mobile first)
    ═══════════════════════════════════════════════════════════ */
 @import './art.css';
 
@@ -245,7 +245,7 @@ button.action-card.create{
 .howto p{ margin:8px 2px 0; font-size:13px; line-height:1.55; color:var(--ink-soft); }
 .howto b{ color:var(--ink); }
 
-/* follow button — bigger, soft contrast */
+/* follow button  -  bigger, soft contrast */
 .tw-btn{
   display:flex; align-items:center; justify-content:center; gap:9px;
   margin-top:16px; padding:14px 18px;
@@ -339,7 +339,7 @@ button.action-card.create{
 .btn-row .btn{ flex:1; min-width:130px; }
 .btn-row.spread{ margin-top:16px; }
 
-/* ═══════════════ GAME SCREEN — mobile first, no scroll ═══════════════ */
+/* ═══════════════ GAME SCREEN  -  mobile first, no scroll ═══════════════ */
 .game-screen{
   height:100dvh;
   display:flex; flex-direction:column;
@@ -407,7 +407,7 @@ button.action-card.create{
 }
 @keyframes scorepulse{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
 
-/* board — fills all remaining space */
+/* board  -  fills all remaining space */
 .board-wrap{
   flex:1 1 auto; min-height:0; position:relative;
 }
@@ -606,7 +606,7 @@ button.action-card.create{
   background:linear-gradient(180deg, var(--cream), #f7e5cd);
   border:2.5px solid rgba(122,90,65,.14);
   display:flex; align-items:center; justify-content:center;
-  transition:all .15s ease; overflow:hidden;
+  transition:all .15s ease; overflow:visible;
 }
 .pfp img{ width:72%; pointer-events:none; }
 .pfp.on{
@@ -616,7 +616,7 @@ button.action-card.create{
   box-shadow:0 10px 20px -8px rgba(217,111,63,.55);
 }
 .pfp-check{
-  position:absolute; right:6px; bottom:6px;
+  position:absolute; right:-4px; bottom:-4px;
   width:22px; height:22px; border-radius:50%;
   background:var(--clay-deep); color:#fff;
   display:flex; align-items:center; justify-content:center;

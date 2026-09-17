@@ -1,6 +1,6 @@
 /**
  * ─────────────────────────────────────────────────────────────
- *  DILICARDS — game engine (pure logic, no DOM, no network)
+ *  DILICARDS  -  game engine (pure logic, no DOM, no network)
  *
  *  Rules:
  *   • 2 players, hot-seat over the network (host is authoritative)
@@ -76,7 +76,7 @@ function flip(S, cardId){
     a.state='matched'; b.state='matched';
     S.scores[S.turn]++;
     S.flipped=[];
-    resetTimer(S);                       // go again — fresh 10s
+    resetTimer(S);                       // go again  -  fresh 10s
     if(S.cards.every(x=>x.state==='matched')){
       S.phase='done';
       S.winner=S.scores[1]>S.scores[2] ? 1 : (S.scores[2]>S.scores[1] ? 2 : 0);

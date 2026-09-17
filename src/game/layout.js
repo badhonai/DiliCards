@@ -1,5 +1,5 @@
 /**
- * DILICARDS — scattered card layout.
+ * DILICARDS  -  scattered card layout.
  *
  * Cards are placed at RANDOM positions (no grid!) with a slight random
  * tilt. Collision-checked circle packing guarantees no two cards ever
@@ -35,7 +35,7 @@ function gridFallback(W,H,n){
   return out;
 }
 
-/** Gently even out tight gaps — only commits moves that stay collision-free. */
+/** Gently even out tight gaps  -  only commits moves that stay collision-free. */
 function relaxSafe(pos,r,pad,W,H){
   const minD=2*r+pad, target=minD*1.12, minD2=(minD*0.99)*(minD*0.99);
   function valid(p){

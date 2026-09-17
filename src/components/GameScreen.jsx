@@ -58,7 +58,7 @@ export default function GameScreen({
         {oppBar}
       </div>
 
-      {/* ── the board — fills everything in between ── */}
+      {/* ── the board  -  fills everything in between ── */}
       <Board S={S} onCardTap={onCardTap}/>
 
       {/* ── you: BOTTOM ── */}
@@ -71,7 +71,7 @@ export default function GameScreen({
           </span>
           <div className="sc-main">
             <span className="sc-name">{myName} <em>(you)</em></span>
-            <span className="sc-label">{!notMyTurn ? 'your turn — flip 2' : 'waiting'}</span>
+            <span className="sc-label">{!notMyTurn ? 'your turn, flip 2' : 'waiting'}</span>
           </div>
           <span className={'sc-score mine' + (!notMyTurn ? ' live' : '')}>{S.scores[2]}</span>
         </div>
@@ -93,11 +93,11 @@ export default function GameScreen({
         </div>
       </div>
 
-      {S.phase==='locked' && <div className="lock-note">No match — cards flipping back…</div>}
+      {S.phase==='locked' && <div className="lock-note">No match. Cards flipping back…</div>}
 
       {!connected && !lost && S.phase!=='done' && (
         <div className="conn-banner">
-          {isHost ? <>Waiting for a friend — share the code <b>{roomCode}</b></> : 'Connecting to the host…'}
+          {isHost ? <>Waiting for a friend. Share the code <b>{roomCode}</b></> : 'Connecting to the host…'}
         </div>
       )}
 

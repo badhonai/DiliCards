@@ -17,7 +17,7 @@ export default function Board({ S, onCardTap }){
   const deckKey = S.deck.join(',');
   const n = S.cards.length;
 
-  // Card size (as % of board width) for this board size — see CFG.LAYOUT.
+  // Card size (as % of board width) for this board size  -  see CFG.LAYOUT.
   // Fall back to the first board size rather than ever laying out a NaN board.
   const pct = (CFG.LAYOUT[S.pairs] || CFG.LAYOUT[CFG.BOARD_SIZES[0].pairs] || { pct: 18 }).pct;
 

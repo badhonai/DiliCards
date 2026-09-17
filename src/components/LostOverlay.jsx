@@ -2,8 +2,8 @@ import { IconCopy, IconHome, IconRefresh } from './Icons.jsx';
 
 /**
  * "Opponent disconnected" overlay.
- * Host: the room stays alive — friend can rejoin, or you can go home.
- * Guest: the room lives on the host's phone — retry or go home.
+ * Host: the room stays alive  -  friend can rejoin, or you can go home.
+ * Guest: the room lives on the host's phone  -  retry or go home.
  */
 export default function LostOverlay({ isHost, roomCode, roomLink, onGoHome, onRetry, onCopyLink }){
   return (
@@ -12,7 +12,7 @@ export default function LostOverlay({ isHost, roomCode, roomLink, onGoHome, onRe
         <h2 className="lost-title">Opponent left</h2>
         <p className="lost-sub">
           {isHost
-            ? <>Your room is still open for <b>2 minutes</b> — if they reopen the link they'll rejoin this game. You can also start fresh.</>
+            ? <>Your room is still open for <b>2 minutes</b>. If they reopen the link they'll rejoin this game. You can also start fresh.</>
             : <>The host's game ended. You can <b>reconnect</b> right away, or head back home.</>}
         </p>
         {isHost && (

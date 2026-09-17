@@ -1,6 +1,6 @@
 /**
  * ─────────────────────────────────────────────────────────────
- *  DILICARDS — app state orchestrator (React hook)
+ *  DILICARDS  -  app state orchestrator (React hook)
  *
  *  Host  → runs the authoritative engine, broadcasts state syncs
  *  Guest → mirrors state from syncs, sends tap intents
@@ -8,7 +8,7 @@
  *
  *  Onboarding: first launch (or a first-time join link) shows a
  *  popup to pick a name + Dili avatar. A join link never bounces
- *  to the home screen — submit goes straight into the game.
+ *  to the home screen  -  submit goes straight into the game.
  * ─────────────────────────────────────────────────────────────
  */
 import { useState, useRef, useEffect, useReducer, useCallback } from 'react';
@@ -268,12 +268,12 @@ export function useDiliGame(){
 
   /* ── both: the current connection dropped ── */
   const onFriendLost = useCallback((conn)=>{
-    if(connRef.current!==conn) return;   // stale conn — already replaced
+    if(connRef.current!==conn) return;   // stale conn  -  already replaced
     connRef.current = null;
     setConnected(false);
     stopTimerLoop();
     if(roleRef.current==='host'){
-      // room stays alive — friend can rejoin; only nag after a moment
+      // room stays alive  -  friend can rejoin; only nag after a moment
       clearTimeout(lostTo.current);
       lostTo.current = setTimeout(()=>{
         if(!connRef.current) setLost(true);
@@ -321,7 +321,7 @@ export function useDiliGame(){
             bump();
           }, 400);
         } else {
-          showToast('Matchmaking hiccup — retrying…');
+          showToast('Matchmaking hiccup. Retrying…');
         }
       },
     };
@@ -402,7 +402,7 @@ export function useDiliGame(){
 
     if(roleRef.current==='guest'){
       if(S.turn!==2 || S.flipped.length>=2) return;
-      card.state='up';                      // optimistic — host's sync confirms
+      card.state='up';                      // optimistic  -  host's sync confirms
       S.flipped.push(id);
       sfx('flip'); buzz(15);
       bump();
