@@ -40,9 +40,11 @@ export default function MenuScreen({
         {/* ── identity: your Dili + name ── */}
         <button className="identity" onClick={onEditIdentity} aria-label="Edit name and avatar">
           <div className="id-avatar">
-            {avSrc
-              ? <img src={avSrc} alt="Your avatar"/>
-              : <span className="id-avatar-empty"><IconPencil/></span>}
+            <span className="id-avatar-clip">
+              {avSrc
+                ? <img src={avSrc} alt="Your avatar"/>
+                : <span className="id-avatar-empty"><IconPencil/></span>}
+            </span>
             <span className="id-edit" aria-hidden="true"><IconPencil size={12}/></span>
           </div>
           <div className="id-main">
