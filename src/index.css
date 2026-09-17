@@ -633,13 +633,6 @@ button.action-card.create{
     inset 0 -3px 6px rgba(180,120,60,.18);
   display:flex; align-items:center; justify-content:center;
 }
-.face--front::after{
-  content:''; position:absolute; inset:5.5%;
-  border-radius:12%;
-  background:rgba(255,255,255,.55);
-  box-shadow:inset 0 1px 4px rgba(255,255,255,.9);
-  pointer-events:none;
-}
 .card.matched{ filter:drop-shadow(0 0 14px rgba(232,176,75,.8)); }
 
 /* art faces (imported in art.css) */
