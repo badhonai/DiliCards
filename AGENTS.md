@@ -37,7 +37,7 @@ Read this first. It is the single source of truth for picking up work in a new s
 6. **UI style:** claymorphism - no straight borders, no grid system; cards at random non-overlapping positions; the **10 Dili GIFs** (`src/assets/art/art-0..9.gif`) are the ONLY card faces.
 7. **Credit:** no plain "@BadhonAI" text - follow button only (`MenuScreen` + `.tw-btn`), bigger + low-contrast (soft lavender, muted ink).
 8. **Free hosting only** - zero cost, no credit card. Deployment = owner manually uploads `dist/*`.
-9. **NO em dash (the "—" character) anywhere**, not in UI strings, captions, metadata, or comments. The owner dislikes it. Rewrite sentences with commas/periods instead. Also avoid en dash in UI copy.
+9. **NO em dash (U+2014, a long horizontal bar like "---") anywhere**, not in UI strings, captions, metadata, or comments. The owner dislikes it. Rewrite sentences with commas/periods instead. Also avoid en dash in UI copy.
 10. **Rematch requires host approval.** A guest `rematch-req` must NEVER auto-restart the game.
 
 ## Architecture
@@ -146,7 +146,7 @@ npm run dev        # Vite dev server (if you need live reload)
 - `test/p2p.test.mjs` step 8b: a rejoin must match the host's **current** state snapshot (phase/scores/deck), not a fixed expectation - the scenario rejoins after a rematch.
 - Fake PeerJS quirk: both peers must be `open=true` **before** either 'open' event fires, or `FakeConn.send()` drops messages.
 - React SSR renders escape `'` as `&#x27;` and insert `<!-- -->` between adjacent expressions - write test assertions accordingly.
-- **No em dash "—" anywhere** (owner rule). Use comma/period. Applies to UI strings, captions, metadata, and comments.
+- **No em dash (U+2014) anywhere** (owner rule). Use comma/period. Applies to UI strings, captions, metadata, and comments.
 
 ## Environment gotchas
 
