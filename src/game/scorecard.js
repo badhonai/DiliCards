@@ -11,10 +11,12 @@
  *                           stadium podium score cards
  *   • classic (Preset E) -> left avatar framed by classic wheel + grand
  *                           battle board on the right
- *   • cobalt  (Preset F) -> dark midnight sapphire, electric blue neon
- *                           glow duel cards + cyan-rimmed champion avatar
- *   • cyber   (Preset G) -> futuristic deep blue arena with cyber ring,
- *                           cyan solar halo + electric blue stadium podiums
+ *   • cobalt  (Preset F) -> esports cyber face-off: angled laser slash,
+ *                           top HUD broadcast bar, digital holographic score
+ *                           tile + challenger report card
+ *   • cyber   (Preset G) -> symmetrical cyber monolith: apex logo crest,
+ *                           compass holo-portal, floating crown, centered
+ *                           identity + twin digital score deck
  *
  * All presets carry: logo + wordmark, champion pill, winner name + score,
  * opponent name + score (masked as "???" when the winner hides it), and
@@ -81,7 +83,7 @@ function coverImage(ctx, img, w, h){
 /** Fit a bold text size down to `maxW`. */
 function fitSize(ctx, text, start, maxW){
   let size = start;
-  while(size > 30){
+  while(size > 26){
     ctx.font = `800 ${size}px system-ui, sans-serif`;
     if(ctx.measureText(text).width <= maxW) break;
     size -= 2;
@@ -200,6 +202,34 @@ function pfpCircle(ctx, av, cx, cy, r, ringColor, glowColor, bgFill){
   }
   ctx.strokeStyle = 'rgba(255,255,255,.92)'; ctx.lineWidth = 6;
   ctx.beginPath(); ctx.arc(cx, cy, r-14, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+}
+
+function drawCrown(ctx, cx, cy, w, h, color){
+  ctx.save();
+  ctx.fillStyle = color || '#fbbf24';
+  ctx.beginPath();
+  ctx.moveTo(cx - w/2, cy + h/2);
+  ctx.lineTo(cx - w/2, cy - h/4);
+  ctx.lineTo(cx - w/4, cy);
+  ctx.lineTo(cx, cy - h/2);
+  ctx.lineTo(cx + w/4, cy);
+  ctx.lineTo(cx + w/2, cy - h/4);
+  ctx.lineTo(cx + w/2, cy + h/2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  for(const jx of [cx - w/2, cx, cx + w/2]){
+    ctx.beginPath();
+    ctx.arc(jx, (jx===cx ? cy - h/2 - 4 : cy - h/4 - 4), 5, 0, Math.PI*2);
+    ctx.fillStyle = '#00f0ff';
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -449,124 +479,409 @@ export async function renderScorecard(variant, d){
 
     footer(ctx, FOOT, { x:rx, y:1008 });
   } else if(variant.id === 'cobalt'){
-    // Preset F: dark cobalt & electric blue duel
-    header(ctx, lgW || lg, { x:96 }, '#ffffff');
-    pill(ctx, 'COBALT DUEL', { x:104, y:228, top:'#38bdf8', color:'#1d4ed8', strokeColor:'rgba(255,255,255,0.4)' });
-    nameText(ctx, safe.winnerName, { x:100, y:336 }, 145, 950, '#f0f9ff', 'rgba(56, 189, 248, 0.55)');
+    // Preset F: reimagined esports cyber clash (face-off)
+    // 1. Top HUD broadcast bar
+    roundRect(ctx, 80, 40, 1760, 68, 34);
+    ctx.fillStyle = 'rgba(8, 16, 32, 0.75)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.45)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-    // Glowing duel battle cards
-    const tx1 = 100, ty1 = 540, tw1 = 360, th1 = 175;
-    const gTile = ctx.createLinearGradient(tx1, ty1, tx1, ty1 + th1);
-    gTile.addColorStop(0, 'rgba(37, 99, 235, 0.35)');
-    gTile.addColorStop(1, 'rgba(29, 78, 216, 0.55)');
-    roundRect(ctx, tx1, ty1, tw1, th1, 26);
-    ctx.fillStyle = gTile; ctx.fill();
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.85)'; ctx.lineWidth = 3.5; ctx.stroke();
-
-    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    ctx.font = `800 24px system-ui, sans-serif`;
-    ctx.fillStyle = '#7dd3fc';
-    ctx.fillText(safe.winnerName.slice(0,8).toUpperCase(), tx1 + tw1/2, ty1 + 42);
-    ctx.font = `800 96px system-ui, sans-serif`;
+    ctx.drawImage(lgW || lg, 104, 52, 44, 44);
+    ctx.font = '800 30px system-ui, sans-serif';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(String(safe.winnerScore), tx1 + tw1/2, ty1 + th1 - 32);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('DILICARDS DUEL', 162, 74);
 
-    const tx2 = 490, ty2 = 540, tw2 = 330, th2 = 175;
-    roundRect(ctx, tx2, ty2, tw2, th2, 26);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(147, 197, 253, 0.4)'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(960 - 130, 74, 6, 0, Math.PI*2);
+    ctx.fillStyle = '#22c55e';
+    ctx.fill();
+    ctx.font = '800 22px system-ui, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.textAlign = 'center';
+    ctx.fillText('LIVE P2P DUEL REPORT', 960, 74);
+
+    ctx.textAlign = 'right';
+    ctx.font = '800 20px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.fillText('OFFICIAL VICTORY SCREEN', 1800, 74);
+
+    // 2. Background Stencil "VICTORY"
+    ctx.save();
+    ctx.font = '900 160px system-ui, sans-serif';
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.06)';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('VICTORY', 80, 270);
+    ctx.restore();
+
+    // 3. Winner Zone (Left)
+    const avX = 360, avY = 530, r = 195;
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
+    ctx.lineWidth = 4;
+    for(let a = 0; a < 360; a += 90){
+      const rad = a * Math.PI / 180;
+      ctx.beginPath();
+      ctx.arc(avX, avY, r + 24, rad - 0.25, rad + 0.25);
+      ctx.stroke();
+    }
+
+    ctx.save();
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 45;
+    ctx.beginPath();
+    ctx.arc(avX, avY, r, 0, Math.PI*2);
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 12;
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(avX, avY, r, 0, Math.PI*2);
+    ctx.clip();
+    ctx.fillStyle = '#f0f9ff';
+    ctx.fillRect(avX - r, avY - r, r*2, r*2);
+    const s = r * 1.95;
+    ctx.drawImage(av, avX - s/2, avY - s/2 + 10, s, s);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(avX, avY, r - 12, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
+
+    drawCrown(ctx, avX, avY - r - 30, 80, 48, '#fbbf24');
+
+    const ribW = 320, ribH = 56, ribX = avX - ribW/2, ribY = avY + r - 28;
+    const gRib = ctx.createLinearGradient(0, ribY, 0, ribY + ribH);
+    gRib.addColorStop(0, '#00f0ff');
+    gRib.addColorStop(1, '#1d4ed8');
+    roundRect(ctx, ribX, ribY, ribW, ribH, ribH/2);
+    ctx.fillStyle = gRib;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '800 24px system-ui, sans-serif';
+    ctx.fillText('MATCH WINNER', avX, ribY + ribH/2 + 1);
+
+    const wx = 620;
+    ctx.font = '800 24px system-ui, sans-serif';
+    const ctw = ctx.measureText('CHAMPION').width;
+    roundRect(ctx, wx, 280, ctw + 56, 44, 22);
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+    ctx.fill();
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#00f0ff';
+    ctx.textAlign = 'center';
+    ctx.fillText('CHAMPION', wx + (ctw + 56)/2, 302);
+
+    const nameSize = fitSize(ctx, safe.winnerName, 115, 340);
+    ctx.font = '900 ' + nameSize + 'px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 240, 255, 0.6)';
+    ctx.shadowBlur = 24;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(safe.winnerName, wx, 420);
+    ctx.restore();
+
+    const cardX = wx, cardY = 460, cardW = 330, cardH = 260;
+    const gCard = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
+    gCard.addColorStop(0, 'rgba(0, 240, 255, 0.25)');
+    gCard.addColorStop(1, 'rgba(29, 78, 216, 0.55)');
+    roundRect(ctx, cardX, cardY, cardW, cardH, 28);
+    ctx.fillStyle = gCard;
+    ctx.fill();
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cardX + 16, cardY + 16, 12, 3);
+    ctx.fillRect(cardX + 16, cardY + 16, 3, 12);
+    ctx.fillRect(cardX + cardW - 28, cardY + 16, 12, 3);
+    ctx.fillRect(cardX + cardW - 19, cardY + 16, 3, 12);
 
     ctx.textAlign = 'center';
-    ctx.font = `800 24px system-ui, sans-serif`;
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText(oppLabel.slice(0,8).toUpperCase(), tx2 + tw2/2, ty2 + 42);
-    ctx.font = `800 96px system-ui, sans-serif`;
-    ctx.fillStyle = '#cbd5e1';
-    ctx.fillText(String(safe.oppScore), tx2 + tw2/2, ty2 + th2 - 32);
-
-    vsBadge(ctx, 475, ty1 + th1/2, { bg:'#38bdf8', stroke:'#ffffff', color:'#0f172a', r:35, lineWidth:4 });
-
-    ctx.textAlign = 'left'; ctx.font = `800 28px system-ui, sans-serif`;
+    ctx.font = '800 24px system-ui, sans-serif';
     ctx.fillStyle = '#7dd3fc';
-    ctx.fillText('COBALT VICTOR   ·   ' + safe.winnerScore + ' PAIRS CONQUERED', 104, 780);
+    ctx.fillText('FINAL SCORE', cardX + cardW/2, cardY + 50);
 
-    pfpCircle(ctx, av, 1520, 545, 245, '#38bdf8', 'rgba(56, 189, 248, 0.7)', '#f0f9ff');
-
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(100, 940); ctx.lineTo(840, 940); ctx.stroke();
-
-    footer(ctx, FOOT, { x:100, y:1008, color:'#93c5fd' });
-  } else if(variant.id === 'cyber'){
-    // Preset G: cyber arena dark blue & cyan
-    header(ctx, lgW || lg, { x:96 }, '#ffffff');
-    pill(ctx, 'CYBER DUEL', { x:104, y:224, top:'#06b6d4', color:'#2563eb', strokeColor:'rgba(255,255,255,0.5)' });
-    nameText(ctx, safe.winnerName, { x:100, y:326 }, 135, 960, '#f0fdf4', 'rgba(6, 182, 212, 0.5)');
-
-    ctx.font = `800 34px system-ui, sans-serif`;
-    ctx.fillStyle = '#38bdf8';
-    ctx.fillText('Crown Match   ·   Undefeated Cyber Duel', 104, 510);
-
-    // Stadium podiums
-    const px1 = 100, py1 = 565, pw1 = 380, ph1 = 195;
-    const gWin = ctx.createLinearGradient(px1, py1, px1, py1 + ph1);
-    gWin.addColorStop(0, '#0284c7'); gWin.addColorStop(1, '#1d4ed8');
-    roundRect(ctx, px1, py1, pw1, ph1, 30);
-    ctx.fillStyle = gWin; ctx.fill();
-    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 4; ctx.stroke();
-
-    ctx.textAlign = 'left';
-    ctx.font = `800 24px system-ui, sans-serif`;
-    ctx.fillStyle = '#bae6fd';
-    ctx.fillText('WINNER', px1 + 36, py1 + 48);
-    ctx.font = `800 108px system-ui, sans-serif`;
+    ctx.save();
+    ctx.font = '900 145px system-ui, sans-serif';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(String(safe.winnerScore), px1 + 36, py1 + ph1 - 36);
-    ctx.font = `800 32px system-ui, sans-serif`;
-    ctx.fillStyle = '#bae6fd';
-    ctx.fillText('PAIRS', px1 + 130, py1 + ph1 - 42);
+    ctx.shadowColor = 'rgba(0, 240, 255, 0.8)';
+    ctx.shadowBlur = 30;
+    ctx.fillText(String(safe.winnerScore), cardX + cardW/2, cardY + cardH - 55);
+    ctx.restore();
 
-    const px2 = 520, py2 = 595, pw2 = 320, ph2 = 165;
-    roundRect(ctx, px2, py2, pw2, ph2, 26);
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.font = '800 26px system-ui, sans-serif';
+    ctx.fillStyle = '#7dd3fc';
+    ctx.fillText('PAIRS FOUND', cardX + cardW/2, cardY + cardH - 22);
+
+    // 4. Center 3D Floating "VS" Diamond
+    const vsX = 1010, vsY = 540;
+    ctx.save();
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 35;
+    ctx.beginPath();
+    ctx.moveTo(vsX, vsY - 60);
+    ctx.lineTo(vsX + 55, vsY);
+    ctx.lineTo(vsX, vsY + 60);
+    ctx.lineTo(vsX - 55, vsY);
+    ctx.closePath();
+    const gVs = ctx.createLinearGradient(vsX - 55, vsY - 60, vsX + 55, vsY + 60);
+    gVs.addColorStop(0, '#00f0ff');
+    gVs.addColorStop(1, '#1d4ed8');
+    ctx.fillStyle = gVs;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#040d1a';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 32px system-ui, sans-serif';
+    ctx.fillText('VS', vsX, vsY + 1);
+
+    // 5. Right Zone: Challenger Panel
+    const chX = 1140, chY = 320, chW = 700, chH = 430;
+    roundRect(ctx, chX, chY, chW, chH, 32);
+    ctx.fillStyle = 'rgba(10, 18, 36, 0.7)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
 
     ctx.textAlign = 'left';
-    ctx.font = `800 22px system-ui, sans-serif`;
-    ctx.fillStyle = '#7dd3fc';
-    ctx.fillText('vs ' + oppLabel.slice(0,8).toUpperCase(), px2 + 32, py2 + 46);
-    ctx.font = `800 84px system-ui, sans-serif`;
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillText(String(safe.oppScore), px2 + 32, py2 + ph2 - 32);
-    ctx.font = `800 28px system-ui, sans-serif`;
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = '800 24px system-ui, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('CHALLENGER BREAKDOWN', chX + 48, chY + 64);
+
+    const oppSize = fitSize(ctx, oppLabel, 80, chW - 96);
+    ctx.font = '900 ' + oppSize + 'px system-ui, sans-serif';
     ctx.fillStyle = '#94a3b8';
-    ctx.fillText('PAIRS', px2 + 105, py2 + ph2 - 36);
+    ctx.fillText(oppLabel, chX + 48, chY + 160);
 
-    vsBadge(ctx, 505, 675, { r:34, bg:'#06b6d4', stroke:'#ffffff', color:'#042f2e' });
+    roundRect(ctx, chX + 48, chY + 210, 320, 160, 22);
+    ctx.fillStyle = 'rgba(2, 6, 23, 0.6)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(100, 116, 139, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-    // Cyber Avatar on right (aligned with cyber ring watermark at 1510, 560)
-    const cx = 1510, cy = 560, r = 265;
+    ctx.font = '800 22px system-ui, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('PAIRS MATCHED', chX + 76, chY + 252);
+
+    ctx.font = '900 84px system-ui, sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText(String(safe.oppScore), chX + 76, chY + 342);
+
+    const defX = chX + 410, defY = chY + 250, defW = 240, defH = 75;
+    roundRect(ctx, defX, defY, defW, defH, 20);
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '800 24px system-ui, sans-serif';
+    ctx.fillStyle = '#f87171';
+    ctx.fillText('DEFEATED', defX + defW/2, defY + defH/2 + 1);
+
+    // 6. Bottom Telemetry Bar
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(cx, cy, r + 24, 0, Math.PI*2);
+    ctx.moveTo(80, 940);
+    ctx.lineTo(1840, 940);
+    ctx.stroke();
+
+    ctx.font = '800 28px system-ui, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('◈ DILICARDS DUEL   ·   dilicard.badhon.online   ·   @BadhonAI', 80, 1008);
+
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.fillText('MEMORY MATCH PROTOCOL v1.0', 1840, 1008);
+  } else if(variant.id === 'cyber'){
+    // Preset G: reimagined symmetrical cyber monolith (centered holo-portal)
+    const cx = 960;
+
+    // 1. Apex Brand Crest
+    ctx.save();
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 35;
+    ctx.drawImage(lgW || lg, cx - 42, 60, 84, 84);
+    ctx.restore();
+
+    ctx.font = '900 48px system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('DILICARDS', cx, 180);
+
+    // 2. The Centerpiece Holo-Portal (Avatar)
+    const avY = 440, r = 195;
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+    ctx.lineWidth = 3;
+    for(let deg = 0; deg < 360; deg += 30){
+      const rad = deg * Math.PI / 180;
+      const x1 = cx + (r + 20) * Math.cos(rad);
+      const y1 = avY + (r + 20) * Math.sin(rad);
+      const x2 = cx + (r + (deg % 90 === 0 ? 42 : 30)) * Math.cos(rad);
+      const y2 = avY + (r + (deg % 90 === 0 ? 42 : 30)) * Math.sin(rad);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.arc(cx, avY, r + 15, 0, Math.PI*2);
     ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
-    ctx.lineWidth = 5;
-    ctx.setLineDash([12, 12]);
+    ctx.lineWidth = 4;
+    ctx.setLineDash([12, 10]);
     ctx.stroke();
     ctx.setLineDash([]);
 
-    pfpCircle(ctx, av, cx, cy, r, '#2563eb', 'rgba(37, 99, 235, 0.6)', '#f0f9ff');
+    ctx.save();
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 50;
+    ctx.beginPath();
+    ctx.arc(cx, avY, r, 0, Math.PI*2);
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 14;
+    ctx.stroke();
+    ctx.restore();
 
-    // Ribbon under avatar
-    const ribW = 340, ribH = 64, ribX = cx - ribW/2, ribY = cy + r - 36;
-    const gRib = ctx.createLinearGradient(0, ribY, 0, ribY + ribH);
-    gRib.addColorStop(0, '#06b6d4'); gRib.addColorStop(1, '#1e40af');
-    roundRect(ctx, ribX, ribY, ribW, ribH, ribH/2);
-    ctx.fillStyle = gRib; ctx.fill();
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.stroke();
-    ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.font = `800 28px system-ui, sans-serif`;
-    ctx.fillText('CYBER CHAMPION', cx, ribY + ribH/2 + 1);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, avY, r, 0, Math.PI*2);
+    ctx.clip();
+    ctx.fillStyle = '#f0f9ff';
+    ctx.fillRect(cx - r, avY - r, r*2, r*2);
+    const s = r * 1.95;
+    ctx.drawImage(av, cx - s/2, avY - s/2 + 10, s, s);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(cx, avY, r - 14, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.restore();
 
-    footer(ctx, FOOT, { x:100, y:1008, color:'#7dd3fc' });
+    drawCrown(ctx, cx, avY - r - 32, 90, 52, '#fbbf24');
+
+    // 3. Winner Identity directly under the portal
+    const nameSize = fitSize(ctx, safe.winnerName, 100, 1000);
+    ctx.font = '900 ' + nameSize + 'px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 240, 255, 0.75)';
+    ctx.shadowBlur = 30;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(safe.winnerName, cx, 705);
+    ctx.restore();
+
+    ctx.font = '800 26px system-ui, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText('UNDISPUTED MEMORY DUEL CHAMPION', cx, 750);
+
+    // 4. Symmetrical Dual Score Matrix (Bottom)
+    const tW = 390, tH = 155;
+    const wX = cx - tW - 40, tY = 790;
+    const gWin = ctx.createLinearGradient(wX, tY, wX, tY + tH);
+    gWin.addColorStop(0, 'rgba(0, 240, 255, 0.28)');
+    gWin.addColorStop(1, 'rgba(29, 78, 216, 0.6)');
+    roundRect(ctx, wX, tY, tW, tH, 26);
+    ctx.fillStyle = gWin;
+    ctx.fill();
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = '800 22px system-ui, sans-serif';
+    ctx.fillStyle = '#7dd3fc';
+    ctx.fillText('★ WINNER SCORE', wX + 36, tY + 44);
+
+    ctx.font = '900 92px system-ui, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(String(safe.winnerScore), wX + 36, tY + tH - 32);
+
+    ctx.font = '800 28px system-ui, sans-serif';
+    ctx.fillStyle = '#7dd3fc';
+    ctx.fillText('PAIRS FOUND', wX + 130, tY + tH - 38);
+
+    const oX = cx + 40;
+    roundRect(ctx, oX, tY, tW, tH, 26);
+    ctx.fillStyle = 'rgba(10, 18, 36, 0.75)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.font = '800 22px system-ui, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('vs ' + oppLabel.toUpperCase(), oX + 36, tY + 44);
+
+    ctx.font = '900 92px system-ui, sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText(String(safe.oppScore), oX + 36, tY + tH - 32);
+
+    ctx.font = '800 28px system-ui, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('PAIRS FOUND', oX + 130, tY + tH - 38);
+
+    const vsDiaY = tY + tH/2;
+    ctx.save();
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 25;
+    ctx.beginPath();
+    ctx.moveTo(cx, vsDiaY - 40);
+    ctx.lineTo(cx + 36, vsDiaY);
+    ctx.lineTo(cx, vsDiaY + 40);
+    ctx.lineTo(cx - 36, vsDiaY);
+    ctx.closePath();
+    ctx.fillStyle = '#00f0ff';
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#020617';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '900 22px system-ui, sans-serif';
+    ctx.fillText('VS', cx, vsDiaY + 1);
+
+    // 5. Centered Footer
+    ctx.font = '800 28px system-ui, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('◈ dilicard.badhon.online   ·   @BadhonAI ◈', cx, 1025);
   } else {
     // Preset A: hero
     header(ctx, lg, { x:96 });
