@@ -17,12 +17,12 @@ A **2-player, real-time memory-match (concentration) game played on two phones**
 
 | Feature | State |
 |---|---|
-| Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 7 presets "Preset A" to "Preset G" (Hero, Banner, Midnight, Solar, Classic, Cobalt, Cyber), hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
-| Theme system | **Default Dark & Blue** with full Light (warm clay) mode. Theme toggle switch on top utility bar (`ThemeToggle.jsx`) and in game dock. State persisted in localStorage (`dili_theme`). |
+| Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 4 presets "Preset D" to "Preset G" (Solar, Classic, Cobalt, Cyber; presets A, B, C removed), hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
+| Theme system | **Default Dark & Blue** with full Light (warm clay) mode. Theme toggle switch on top header (`ThemeToggle.jsx`) and in game dock. State persisted in localStorage (`dili_theme`). |
 | Old winner **postcards** | **OFF** (`CFG.POSTCARDS_ENABLED=false`). Round 1 rejected by owner. Do NOT enable without owner approval. |
 | Rematch | **Host must approve.** Guest sends a request; nothing restarts until the host accepts. |
 | Identity | User picks name + one of 4 Dili stickers (never random). Saved to localStorage. |
-| Tests | **124/124 green** (engine 40, render 47, p2p 37). |
+| Tests | **125/125 green** (engine 40, render 48, p2p 37). |
 
 ## 3. File map (where everything lives)
 
@@ -46,7 +46,7 @@ dilicards/
 │   │   ├── art/art-0..9.gif   the 10 Dili GIFs = THE ONLY card faces
 │   │   ├── dili-*.png         4 stickers = avatar pool + mascots
 │   │   ├── postcards/*.jpg    6 rejected postcard backgrounds (keep, unused)
-│   │   └── scorecards/        sc-hero, sc-banner, sc-night, sc-ring, sc-classic, sc-cobalt, sc-cyber (7 active)
+│   │   └── scorecards/        sc-ring, sc-classic, sc-cobalt, sc-cyber (4 active; hero, banner, night removed)
 │   ├── game/                  pure logic, no React, unit-testable
 │   │   ├── engine.js          ★ state machine: flips, match/mismatch, timer, scores, sync payloads
 │   │   ├── net.js             PeerJS wrapper: createHost/createGuest/send/makeCode

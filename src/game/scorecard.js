@@ -1,17 +1,13 @@
 /**
  * DILICARDS  -  winner score cards (shareable, winner-only)
  *
- * Seven 16:9 backgrounds (Preset A to Preset G), each with its own
+ * Four 16:9 backgrounds (Preset D to Preset G), each with its own
  * custom layout and aesthetic:
- *   • hero    (Preset A) -> classic clay duel, side score tiles + big avatar
- *   • banner  (Preset B) -> diagonal orange power slice + giant 360px score
- *   • night   (Preset C) -> dark obsidian night, glowing ember warmth,
- *                           frosted glass duel cards + white brand crest
  *   • ring    (Preset D) -> solar sunburst ring framing winner avatar +
  *                           stadium podium score cards
  *   • classic (Preset E) -> left avatar framed by classic wheel + grand
  *                           battle board on the right
- *   • cobalt  (Preset F) -> esports cyber face-off: angled laser slash,
+ *   • cobalt  (Preset F) -> esports cyber clash: angled laser slash,
  *                           top HUD broadcast bar, digital holographic score
  *                           tile + challenger report card
  *   • cyber   (Preset G) -> symmetrical cyber monolith: apex logo crest,
@@ -29,18 +25,12 @@ import logo from '../assets/logo.png';
 import logoWhite from '../assets/logo-white.png';
 import { avatarUrl } from './avatar.js';
 
-import scHero    from '../assets/scorecards/sc-hero.jpg';
-import scBanner  from '../assets/scorecards/sc-banner.jpg';
-import scNight   from '../assets/scorecards/sc-night.jpg';
 import scRing    from '../assets/scorecards/sc-ring.jpg';
 import scClassic from '../assets/scorecards/sc-classic.jpg';
 import scCobalt  from '../assets/scorecards/sc-cobalt.jpg';
 import scCyber   from '../assets/scorecards/sc-cyber.jpg';
 
 export const SCORECARD_VARIANTS = [
-  { id:'hero',    name:'Preset A', w:1920, h:1080, bg:scHero },
-  { id:'banner',  name:'Preset B', w:1920, h:1080, bg:scBanner },
-  { id:'night',   name:'Preset C', w:1920, h:1080, bg:scNight },
   { id:'ring',    name:'Preset D', w:1920, h:1080, bg:scRing },
   { id:'classic', name:'Preset E', w:1920, h:1080, bg:scClassic },
   { id:'cobalt',  name:'Preset F', w:1920, h:1080, bg:scCobalt },
@@ -257,7 +247,7 @@ export async function renderScorecard(variant, d){
     oppScore: d.oppScore ?? 0,
   };
 
-  const isDark = variant.id === 'night' || variant.id === 'cobalt' || variant.id === 'cyber';
+  const isDark = variant.id === 'cobalt' || variant.id === 'cyber';
   const [bg, lg, lgW, av] = await Promise.all([
     loadImage(variant.bg),
     loadImage(logo),
@@ -272,73 +262,7 @@ export async function renderScorecard(variant, d){
 
   const oppLabel = safe.oppName==null ? '???' : safe.oppName;
 
-  if(variant.id === 'banner'){
-    // Preset B: diagonal banner
-    header(ctx, lg, { x:96 });
-    pill(ctx, 'CHAMPION', { x:104, y:224 });
-    nameText(ctx, safe.winnerName, { x:100, y:322 }, 140, 1000);
-    pfpCircle(ctx, av, 270, 640, 118);
-    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = SOFT; ctx.font = `800 44px system-ui, sans-serif`;
-    ctx.fillText('vs ' + oppLabel, 470, 668);
-    ctx.fillStyle = FAINT; ctx.font = `800 30px system-ui, sans-serif`;
-    ctx.fillText(safe.oppScore + ' pairs', 470, 714);
-    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    ctx.fillStyle = '#fff'; ctx.font = `800 360px system-ui, sans-serif`;
-    ctx.fillText(String(safe.winnerScore), 1560, 660);
-    ctx.font = `800 44px system-ui, sans-serif`;
-    ctx.fillStyle = 'rgba(255,240,220,.92)';
-    ctx.fillText('SCORE', 1560, 742);
-    footer(ctx, FOOT, { x:100, y:1008 });
-  } else if(variant.id === 'night'){
-    // Preset C: midnight dark mode
-    header(ctx, lgW || lg, { x:96 }, '#ffffff');
-    pill(ctx, 'CHAMPION', { x:104, y:230, top:'#f8bc54', color:'#cf6a31', strokeColor:'rgba(255,255,255,0.3)' });
-    nameText(ctx, safe.winnerName, { x:100, y:336 }, 145, 950, '#fffdfa', 'rgba(248, 188, 84, 0.45)');
-
-    // Glowing duel battle cards
-    const tx1 = 100, ty1 = 540, tw1 = 360, th1 = 175;
-    const gTile = ctx.createLinearGradient(tx1, ty1, tx1, ty1 + th1);
-    gTile.addColorStop(0, 'rgba(233, 137, 91, 0.28)');
-    gTile.addColorStop(1, 'rgba(207, 106, 49, 0.45)');
-    roundRect(ctx, tx1, ty1, tw1, th1, 26);
-    ctx.fillStyle = gTile; ctx.fill();
-    ctx.strokeStyle = 'rgba(248, 188, 84, 0.75)'; ctx.lineWidth = 3.5; ctx.stroke();
-
-    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    ctx.font = `800 24px system-ui, sans-serif`;
-    ctx.fillStyle = '#ffcf99';
-    ctx.fillText(safe.winnerName.slice(0,8).toUpperCase(), tx1 + tw1/2, ty1 + 42);
-    ctx.font = `800 96px system-ui, sans-serif`;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(String(safe.winnerScore), tx1 + tw1/2, ty1 + th1 - 32);
-
-    const tx2 = 490, ty2 = 540, tw2 = 330, th2 = 175;
-    roundRect(ctx, tx2, ty2, tw2, th2, 26);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)'; ctx.fill();
-    ctx.strokeStyle = 'rgba(168, 135, 106, 0.4)'; ctx.lineWidth = 3; ctx.stroke();
-
-    ctx.textAlign = 'center';
-    ctx.font = `800 24px system-ui, sans-serif`;
-    ctx.fillStyle = '#b89880';
-    ctx.fillText(oppLabel.slice(0,8).toUpperCase(), tx2 + tw2/2, ty2 + 42);
-    ctx.font = `800 96px system-ui, sans-serif`;
-    ctx.fillStyle = '#d0b49f';
-    ctx.fillText(String(safe.oppScore), tx2 + tw2/2, ty2 + th2 - 32);
-
-    vsBadge(ctx, 475, ty1 + th1/2, { bg:'#e8b04b', stroke:'#fffdfa', color:'#301a0e', r:35, lineWidth:4 });
-
-    ctx.textAlign = 'left'; ctx.font = `800 28px system-ui, sans-serif`;
-    ctx.fillStyle = '#ffcf99';
-    ctx.fillText('MATCH VICTOR   ·   ' + safe.winnerScore + ' PAIRS CONQUERED', 104, 780);
-
-    pfpCircle(ctx, av, 1520, 545, 245, '#f8bc54', 'rgba(233, 137, 91, 0.65)');
-
-    ctx.strokeStyle = 'rgba(248, 188, 84, 0.2)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(100, 940); ctx.lineTo(840, 940); ctx.stroke();
-
-    footer(ctx, FOOT, { x:100, y:1008, color:'#d0b49f' });
-  } else if(variant.id === 'ring'){
+  if(variant.id === 'ring'){
     // Preset D: solar stadium ring
     header(ctx, lg, { x:96 });
     pill(ctx, 'SOLAR DUEL', { x:104, y:224, top:'#ffa861', color:DEEP });
@@ -722,8 +646,8 @@ export async function renderScorecard(variant, d){
     ctx.textAlign = 'right';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.fillText('MEMORY MATCH PROTOCOL v1.0', 1840, 1008);
-  } else if(variant.id === 'cyber'){
-    // Preset G: reimagined symmetrical cyber monolith (centered holo-portal)
+  } else {
+    // Preset G (default / cyber): reimagined symmetrical cyber monolith (centered holo-portal)
     const cx = 960;
 
     // 1. Apex Brand Crest
@@ -882,16 +806,6 @@ export async function renderScorecard(variant, d){
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.fillText('◈ dilicard.badhon.online   ·   @BadhonAI ◈', cx, 1025);
-  } else {
-    // Preset A: hero
-    header(ctx, lg, { x:96 });
-    pill(ctx, 'CHAMPION', { x:104, y:236 });
-    nameText(ctx, safe.winnerName, { x:100, y:340 }, 150, 980);
-    tile(ctx, 100, 545, 340, 150, safe.winnerName.slice(0,8).toUpperCase(), safe.winnerScore, false);
-    tile(ctx, 460, 545, 340, 150, oppLabel.slice(0,8).toUpperCase(), safe.oppScore, true);
-    vsBadge(ctx, 450, 620);
-    pfpCircle(ctx, av, 1520, 545, 250);
-    footer(ctx, FOOT, { x:100, y:1008 });
   }
 
   return canvas;

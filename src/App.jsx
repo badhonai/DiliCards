@@ -36,9 +36,11 @@ export default function App(){
   return (
     <div className={`app ${theme}-theme`} data-theme={theme}>
       {g.screen !== 'game' && (
-        <div className="top-utility-bar">
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-        </div>
+        <header className="app-header">
+          <div className="header-inner">
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          </div>
+        </header>
       )}
 
       {g.screen==='menu' && (
