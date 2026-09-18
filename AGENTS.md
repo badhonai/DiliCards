@@ -124,7 +124,7 @@ S = { pairs, deck:[artIds], cards:[{id, art, state:'down'|'up'|'matched'}],
 
 ## 5. Hard rules (owner's, never violate)
 
-1. **Mobile first** - game screen is a locked `100dvh` flex column, no page scroll.
+1. **Mobile first** - game screen is a locked `100dvh` flex column, no page scroll. Desktop viewports adapt via responsive tabletop framing and wide modal showcases without breaking mobile.
 2. **No emoji in the UI** - use the logo and `Icons.jsx` SVGs only.
 3. **Avatars are a user choice** (4 Dili stickers), never random.
 4. **First-join flow**: `?join=CODE` without a saved identity → popup → straight into the game.
