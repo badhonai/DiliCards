@@ -135,7 +135,7 @@ try{
   ok(e.includes('Winner score card'), 'winner sees the shareable score card');
   ok(e.includes('Share on X'), 'score card has an X share button');
   ok(e.includes('Show opponent name'), 'score card offers the hide-opponent toggle');
-  ok(e.includes('Preset A') && e.includes('Preset B') && e.includes('Preset C') && e.includes('Preset D') && e.includes('Preset E'), 'score card offers all approved presets');
+  ok(e.includes('Preset A') && e.includes('Preset B') && e.includes('Preset C') && e.includes('Preset D') && e.includes('Preset E') && e.includes('Preset F') && e.includes('Preset G'), 'score card offers all approved presets');
 
   S.phase='done'; S.winner=2;
   const eLose = renderToString(React.createElement(EndOverlay, {

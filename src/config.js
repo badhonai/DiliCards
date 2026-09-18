@@ -40,7 +40,7 @@ export const CFG = {
   //  update POSTCARD_VARIANTS in src/game/postcard.js, flip this to true.)
   POSTCARDS_ENABLED: false,
 
-  // Winner score cards (shareable). Presets A to E (Hero, Banner, Midnight,
-  // Solar, Classic) in src/assets/scorecards/ with the hide-opponent toggle.
+  // Winner score cards (shareable). Presets A to G (Hero, Banner, Midnight,
+  // Solar, Classic, Cobalt, Cyber) in src/assets/scorecards/ with the hide-opponent toggle.
   SCORECARD_ENABLED: true,
 };
