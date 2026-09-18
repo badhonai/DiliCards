@@ -139,8 +139,8 @@ try{
   ok(e.includes('Winner score card'), 'winner sees the shareable score card');
   ok(e.includes('Share on X'), 'score card has an X share button');
   ok(e.includes('Show opponent name'), 'score card offers the hide-opponent toggle');
-  ok(!e.includes('Preset A') && !e.includes('Preset B') && !e.includes('Preset C'), 'presets A, B, and C removed');
-  ok(e.includes('Preset D') && e.includes('Preset E') && e.includes('Preset F') && e.includes('Preset G'), 'presets D, E, F, and G active');
+  ok(e.includes('Preset A') && e.includes('Preset B') && e.includes('Preset C') && e.includes('Preset D'), 'score card offers presets A, B, C, and D');
+  ok(!e.includes('Preset E') && !e.includes('Preset F') && !e.includes('Preset G'), 'presets E, F, and G are not present');
 
   S.phase='done'; S.winner=2;
   const eLose = renderToString(React.createElement(EndOverlay, {

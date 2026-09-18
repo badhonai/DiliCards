@@ -17,7 +17,7 @@ A **2-player, real-time memory-match (concentration) game played on two phones**
 
 | Feature | State |
 |---|---|
-| Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 4 presets "Preset D" to "Preset G" (Solar, Classic, Cobalt, Cyber; presets A, B, C removed), hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
+| Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 4 presets "Preset A" to "Preset D" (Preset A: Cyber Clash, Preset B: Cyber Monolith, Preset C: Solar Stadium, Preset D: Classic Arena), hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
 | Theme system | **Default Dark & Blue** with full Light (warm clay) mode. Theme toggle switch on top header (`ThemeToggle.jsx`) and in game dock. State persisted in localStorage (`dili_theme`). |
 | Old winner **postcards** | **OFF** (`CFG.POSTCARDS_ENABLED=false`). Round 1 rejected by owner. Do NOT enable without owner approval. |
 | Rematch | **Host must approve.** Guest sends a request; nothing restarts until the host accepts. |
@@ -74,7 +74,7 @@ dilicards/
 │       └── Icons.jsx / XIcon.jsx   inline SVG icons (replace all emoji)
 ├── test/
 │   ├── engine.test.mjs        40 tests - pure rules
-│   ├── render.test.mjs        43 tests - SSR smoke of every screen
+│   ├── render.test.mjs        48 tests - SSR smoke of every screen
 │   ├── p2p.test.mjs           37 tests - two real hooks over a fake PeerJS ("two phones")
 │   ├── fake-peer.mjs          in-memory PeerJS clone
 │   ├── peer-loader.mjs        maps 'peerjs' → fake in Node

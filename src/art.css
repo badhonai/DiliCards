@@ -1,11 +1,11 @@
-/* Card faces  -  the 10 Dili sprites (the ONLY card faces in the game). */
-.art-0 { background-image: url('./assets/art/art-0.gif'); }
-.art-1 { background-image: url('./assets/art/art-1.gif'); }
-.art-2 { background-image: url('./assets/art/art-2.gif'); }
-.art-3 { background-image: url('./assets/art/art-3.gif'); }
-.art-4 { background-image: url('./assets/art/art-4.gif'); }
-.art-5 { background-image: url('./assets/art/art-5.gif'); }
-.art-6 { background-image: url('./assets/art/art-6.gif'); }
-.art-7 { background-image: url('./assets/art/art-7.gif'); }
-.art-8 { background-image: url('./assets/art/art-8.gif'); }
-.art-9 { background-image: url('./assets/art/art-9.gif'); }
+/* Card faces: the 10 Dili sprites (the ONLY card faces in the game). */
+.art-0 { background-image: url('./assets/art/art-0.gif') !important; }
+.art-1 { background-image: url('./assets/art/art-1.gif') !important; }
+.art-2 { background-image: url('./assets/art/art-2.gif') !important; }
+.art-3 { background-image: url('./assets/art/art-3.gif') !important; }
+.art-4 { background-image: url('./assets/art/art-4.gif') !important; }
+.art-5 { background-image: url('./assets/art/art-5.gif') !important; }
+.art-6 { background-image: url('./assets/art/art-6.gif') !important; }
+.art-7 { background-image: url('./assets/art/art-7.gif') !important; }
+.art-8 { background-image: url('./assets/art/art-8.gif') !important; }
+.art-9 { background-image: url('./assets/art/art-9.gif') !important; }
