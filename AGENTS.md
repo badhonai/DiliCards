@@ -1,178 +1,164 @@
 # DiliCards - Agent Handbook
 
-Read this first. It is the single source of truth for picking up work in a new session.
-**Updated after EVERY change. If you change anything, update this file and commit it with the change.**
+> Read this whole file once before touching anything. It describes the repo **as it is right now** (not a changelog). It is the single source of truth, so **update it whenever you change something and commit it with that change.**
 
-## What this is
+---
 
-**DiliCards** - a 2-player, real-time, phone-vs-phone memory-match (concentration) game.
-- **No backend, no accounts, 100% free.** P2P over the free [PeerJS](https://peerjs.com) cloud (broker only for the handshake). The **host is authoritative** (runs the engine, enforces the timer); the guest mirrors state and sends tap intents.
-- Site (user-managed, static): **https://dilicard.badhon.online**
-- Short link (for tweet captions/share text only): **https://dilicard.vercel.app** (redirects to the main site above)
-- GitHub: **`badhonai/DiliCards`** (remote: `https://github.com/badhonai/DiliCards.git`)
-- Brand/X: **@BadhonAI** -> `https://x.com/BadhonAI`
-- Stack: **React 18 + Vite** (plain JS/JSX, no framework, no Tailwind). ~277 kB JS / 84 kB gzip.
+## 1. What this is (5 seconds)
 
-## Current state (2026-09-18)
+A **2-player, real-time memory-match (concentration) game played on two phones**.
 
-- Latest commit: **`d57b003`** - "(you)" marker fixed on the host-win scoreboard, and **rematch now requires host approval** (no auto-restart, so the winner can download/share the score card first).
-- Test counts: **engine 40 + render 43 + p2p 37 = 120/120 green.** Build clean.
-- **Winner score cards are LIVE** (`CFG.SCORECARD_ENABLED = true`). Winner-only, on the end screen:
-  - Two backgrounds (**`Preset A`** = hero layout, **`Preset B`** = banner layout) in `src/game/scorecard.js`.
-  - **Hide/show opponent name** toggle, renders the opponent as `???` when hidden.
-  - **Save image** (PNG download) and **Share on X** (opens `x.com/intent/tweet` with a canned caption).
-  - Tweet caption uses the short link `https://dilicard.vercel.app`; the card footer shows `dilicard.badhon.online · @BadhonAI`.
-  - Backgrounds: `src/assets/scorecards/` (hero + banner referenced; classic/ring/night are extra, unreferenced, owner may approve later).
-- **Old winner postcards still OFF** (`CFG.POSTCARDS_ENABLED = false`). Rejected round 1 (6 AI backgrounds in `src/assets/postcards/`). Do not re-enable without owner approval.
-- Branding: new citrus **logo** (`src/assets/logo.png` orange, `logo-white.png` for card backs), warm orange theme (blue accents removed), title/meta = **"DiliCards by BadhonAI"**.
-- Link preview image rebuilt at **1200x630** (`public/og.png`): brand block LEFT, artwork RIGHT (vertically centered), verified no border collisions.
+- **P2P, no backend, free.** PeerJS cloud only brokers the handshake, then phones talk directly.
+- **The host is authoritative**: runs the engine + turn timer. The guest mirrors state and sends tap intents.
+- **Stack:** React 18 + Vite, plain JS/JSX, no Tailwind. Static hosting (owner uploads `dist/*` by hand).
+- **Links:** main site `https://dilicard.badhon.online` · caption short-link `https://dilicard.vercel.app` (redirects to main) · X `@BadhonAI` · repo `badhonai/DiliCards`.
 
-## Standing owner rules (explicit - never violate)
+## 2. What is live right now
 
-1. **Mobile first.** The game screen is a locked `100dvh` flex column (opponent score card TOP, board fills the middle, own score card BOTTOM) - no page scroll, ever.
-2. **No normal emoji anywhere in the UI.** Use the logo and the inline SVG set in `src/components/Icons.jsx`.
-3. **Avatars = user picks one of the 4 Dili stickers** (`src/assets/dili-{cool,funny,handsup,happy}.png`) - saved in `localStorage['dc-name-avatar']`. **Never random.** Picked in the onboarding popup; changeable by tapping the identity card in the menu.
-4. **First-time join flow:** opening `?join=CODE` without saved name/avatar shows a bottom-sheet popup (name + Dili picker) with the room code - submit goes **straight into the game**, never the home screen.
-5. **Rules (fixed):** 2 flips per turn; match = +1 and go again; mismatch or 10s timeout (host-enforced auto-pass) = flip back, other player's turn. Winner = most pairs.
-6. **UI style:** claymorphism - no straight borders, no grid system; cards at random non-overlapping positions; the **10 Dili GIFs** (`src/assets/art/art-0..9.gif`) are the ONLY card faces.
-7. **Credit:** no plain "@BadhonAI" text - follow button only (`MenuScreen` + `.tw-btn`), bigger + low-contrast (soft lavender, muted ink).
-8. **Free hosting only** - zero cost, no credit card. Deployment = owner manually uploads `dist/*`.
-9. **NO em dash (U+2014, a long horizontal bar like "---") anywhere**, not in UI strings, captions, metadata, or comments. The owner dislikes it. Rewrite sentences with commas/periods instead. Also avoid en dash in UI copy.
-10. **Rematch requires host approval.** A guest `rematch-req` must NEVER auto-restart the game.
+| Feature | State |
+|---|---|
+| Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 2 backgrounds "Preset A"/"Preset B", hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
+| Old winner **postcards** | **OFF** (`CFG.POSTCARDS_ENABLED=false`). Round 1 rejected by owner. Do NOT enable without owner approval. |
+| Rematch | **Host must approve.** Guest sends a request; nothing restarts until the host accepts. |
+| Identity | User picks name + one of 4 Dili stickers (never random). Saved to localStorage. |
+| Tests | **120/120 green** (engine 40, render 43, p2p 37). |
 
-## Architecture
+## 3. File map (where everything lives)
 
 ```
 dilicards/
-├── AGENTS.md                  <- you are here (update it with every change)
-├── index.html                 title/meta/OG/Twitter card ("DiliCards by BadhonAI"), og:image
+├── AGENTS.md                  ← this file (keep it current)
+├── index.html                 title + meta/OG/Twitter card ("DiliCards by BadhonAI")
 ├── public/
-│   ├── favicon.png            64x64 logo on cream rounded square
-│   └── og.png                 1200x630 link-preview image (brand left, art right)
+│   ├── favicon.png            64×64 logo on cream square
+│   └── og.png                 1200×630 link-preview image
 ├── src/
-│   ├── main.jsx               entry (createRoot)
-│   ├── App.jsx                screen router: menu | host | join | game + OnboardModal + toast
-│   ├── config.js              ★ ALL TUNABLES: names, links, TURN_SECONDS, LOCK_MS,
-│   │                          BOARD_SIZES, LAYOUT, PREFIX, STORE_KEY,
-│   │                          POSTCARDS_ENABLED (false), SCORECARD_ENABLED (true)
-│   ├── index.css              full clay UI (mobile-first, warnings about overflow/clipping)
+│   ├── main.jsx               React entry (createRoot)
+│   ├── App.jsx                screen router: menu|host|join|game + onboarding popup + toast
+│   ├── config.js              ★ EVERY tunable: names, links, TURN_SECONDS, LOCK_MS,
+│   │                          BOARD_SIZES, LAYOUT, PREFIX, STORE_KEY, feature flags
+│   ├── index.css              all UI styling (clay theme, mobile-first)
 │   ├── art.css                card-face backgrounds (the 10 GIFs)
 │   ├── assets/
-│   │   ├── logo.png           owner citrus logo (warm clay orange, all UI)
-│   │   ├── logo-white.png     same logo white (card-back mark)
-│   │   ├── art/art-0..9.gif   the ONLY card faces
-│   │   ├── dili-*.png         4 3D Dili stickers = avatar pool + mascots
-│   │   ├── postcards/*.jpg    6 rejected round-1 postcard backgrounds (keep for now)
-│   │   └── scorecards/        sc-hero + sc-banner (APPROVED) + classic/ring/night (extra)
-│   ├── game/                  pure logic (no React - unit-testable)
-│   │   ├── engine.js          authoritative state machine: flip/lock/timeout/sync payloads
-│   │   ├── net.js             PeerJS wrapper: createHost/createGuest/send, makeCode, wireOpen
-│   │   ├── layout.js          scattered non-overlapping circle packing (computeLayout)
-│   │   ├── audio.js           WebAudio sfx + buzz + setMuted
-│   │   ├── avatar.js          AVATARS list, loadAvatar (null until chosen), saveAvatar
-│   │   ├── postcard.js        POSTCARD_VARIANTS + canvas renderPostcard (gated OFF)
+│   │   ├── logo.png           owner logo, warm clay orange (used everywhere)
+│   │   ├── logo-white.png     same logo in white (card-back mark)
+│   │   ├── art/art-0..9.gif   the 10 Dili GIFs = THE ONLY card faces
+│   │   ├── dili-*.png         4 stickers = avatar pool + mascots
+│   │   ├── postcards/*.jpg    6 rejected postcard backgrounds (keep, unused)
+│   │   └── scorecards/        sc-hero + sc-banner = THE score cards in use
+│   │                          (sc-classic/ring/night = extras, not referenced yet)
+│   ├── game/                  pure logic, no React, unit-testable
+│   │   ├── engine.js          ★ state machine: flips, match/mismatch, timer, scores, sync payloads
+│   │   ├── net.js             PeerJS wrapper: createHost/createGuest/send/makeCode
+│   │   ├── layout.js          scattered non-overlapping card positions (computeLayout)
+│   │   ├── audio.js           WebAudio sfx + buzz + mute
+│   │   ├── avatar.js          AVATARS list + loadAvatar/saveAvatar (null until user picks)
+│   │   ├── postcard.js        old postcards renderer (OFF, leave alone)
 │   │   └── scorecard.js       ★ SCORECARD_VARIANTS + renderScorecard + tweetText (canvas)
 │   ├── hooks/
-│   │   └── useDiliGame.js     ★ the orchestrator: screens, role, conn, timers, onboarding,
-│   │                          host/guest message handlers, rematch approval, wake lock
+│   │   └── useDiliGame.js     ★ the orchestrator: screens, role, conns, timers,
+│   │                          onboarding, message handlers, rematch approval, wake lock
 │   └── components/
-│       ├── MenuScreen.jsx     identity card (tap -> onboarding), board chips, Create/Join
-│       ├── OnboardModal.jsx   bottom sheet: name + 4-sticker picker (+ join banner)
-│       ├── HostScreen.jsx     code + copy/share link + waiting list
-│       ├── JoinScreen.jsx     connecting… + real error texts (no endless spinner)
-│       ├── GameScreen.jsx     TOP opp score card / Board / BOTTOM own score card + dock
-│       ├── Board.jsx          viewport-fitting board (passes CFG.LAYOUT[S.pairs].pct)
-│       ├── EndOverlay.jsx     You win / X wins / tie + ScorecardPicker when winner
-│       ├── ScorecardPicker.jsx winner-only: bg pick (Preset A/B), hide-opponent, save, X share
-│       ├── LostOverlay.jsx    opponent-left (host: room stays open; guest: reconnect)
-│       ├── PostcardPicker.jsx renders old postcards (unused while gated OFF)
-│       └── Icons.jsx / XIcon.jsx   SVG icon set (no emoji)
+│       ├── MenuScreen.jsx     home: identity card, board-size chips, Create/Join
+│       ├── OnboardModal.jsx   bottom sheet: name + 4-sticker picker
+│       ├── HostScreen.jsx     waiting room: code, copy/share link, waiting list
+│       ├── JoinScreen.jsx     connecting screen + real error messages
+│       ├── GameScreen.jsx     in-game HUD: opponent top, Board, own card bottom
+│       ├── Board.jsx          renders the card field (passes CFG.LAYOUT[pairs].pct)
+│       ├── EndOverlay.jsx     end screen: winner/loser/tie + ScorecardPicker + rematch buttons
+│       ├── ScorecardPicker.jsx ★ winner share card: bg pick, hide-opponent, save, X share
+│       ├── LostOverlay.jsx    "opponent left" (host keeps room; guest can reconnect)
+│       ├── PostcardPicker.jsx old postcards UI (unused while OFF)
+│       └── Icons.jsx / XIcon.jsx   inline SVG icons (replace all emoji)
 ├── test/
-│   ├── engine.test.mjs        40 - pure engine rules (node, no deps)
-│   ├── render.test.mjs        43 - SSR smoke of every screen (Vite ssrLoadModule)
-│   ├── p2p.test.mjs           37 - two real hook instances ("two phones") through a
-│   │                          fake PeerJS: join/flip/match/timeout/rematch/bye/rejoin
-│   ├── fake-peer.mjs          in-memory PeerJS clone (must keep the wireOpen recipe)
-│   ├── peer-loader.mjs        Node loader mapping 'peerjs' -> fake (module.register)
+│   ├── engine.test.mjs        40 tests - pure rules
+│   ├── render.test.mjs        43 tests - SSR smoke of every screen
+│   ├── p2p.test.mjs           37 tests - two real hooks over a fake PeerJS ("two phones")
+│   ├── fake-peer.mjs          in-memory PeerJS clone
+│   ├── peer-loader.mjs        maps 'peerjs' → fake in Node
 │   └── register.mjs / hook-entry.js   test plumbing
-├── legacy/index.html          old single-file v3 (264K) - history only, don't touch
-└── postcards/                 PREVIEW ARTIFACTS ONLY (not shipped): full/thumb mockups
+├── legacy/index.html          old single-file v3, history only, don't touch
+└── postcards/                 preview mockups only, NOT shipped
 ```
 
-Dev-only tooling (OUTSIDE the repo, lives in the workspace but NOT committed):
-- `/home/user/scripts/og_image.py` regenerates `public/og.png` (the link-preview image). Run from `dilicards/` with `python3 /home/user/scripts/og_image.py`.
-- `/home/user/scripts/scorecards5.py` generated the 5 scorecard backgrounds.
-- `/home/user/preview/*.png` owner-review mockups (scorecard set, individual variants).
+**Where to make a common change** (fast lookup):
 
-### Network protocol (both directions unless noted)
+| You want to change... | Edit this |
+|---|---|
+| Timer seconds, lock pause, board sizes, room prefix, links | `src/config.js` |
+| Game rules (flips, scoring, timeout) | `src/game/engine.js` + keep `engine.test.mjs` green |
+| Card/board layout behavior | `src/game/layout.js`, `Board.jsx` |
+| Look & feel / colors / spacing | `src/index.css` |
+| A specific screen's text | the matching file in `src/components/` |
+| Networking / join / reconnect / rematch | `src/game/net.js` + `src/hooks/useDiliGame.js` (p2p tests are the safety net) |
+| Add a scorecard background | `src/assets/scorecards/`, add entry to `SCORECARD_VARIANTS` + a layout branch in `scorecard.js` |
+| Link-preview image (og.png) | run `python3 /home/user/scripts/og_image.py` from the repo root |
+| Tweet caption for the score card | `tweetText()` in `src/game/scorecard.js` |
 
-- `hello` (guest->host on open): `{name, avatar}` - host stores guest identity.
-- `init` (host->guest, on connect AND on rematch approval): `{pairs, deck, hostName, hostAvatar, tl}` - guest rebuilds view, enters game.
-- `sync` (host->guest, after every mutation + 1 Hz `ev:'tick'`): `{cards:[states], flipped:[ids], s1, s2, phase, turn, winner, tl, ev}` - guest applies, plays fx.
-- `tap` (guest->host): `{cardId}` - host validates (its turn, <2 flipped), resolves, syncs back.
-- `rematch-req` (guest->host): `{name}` - host shows Accept / Not now. **Never auto-starts.**
-- `bye` (either) -> opponent shows LostOverlay. **A NEW host connection always takes over** the old one (reconnect support).
+## 4. Core conventions (know these before editing)
 
-Rematch approval flow (important, was a bug):
-- Guest `requestRematch()` sends `rematch-req` and sets `rematchSent=true` (button disabled, "Request sent...").
-- Host sets `rematchReq` (EndOverlay shows "Accept rematch" / "Not now").
-- Host `acceptRematchReq()` -> `startRematch()` (fresh board + `init` + sync) and clears `rematchReq`.
-- Guest receives `init` -> `rematchSent=false`, fresh board shows.
+### Engine state `S`
+```
+S = { pairs, deck:[artIds], cards:[{id, art, state:'down'|'up'|'matched'}],
+      flipped:[ids], scores:{1,2}, turn:1|2, phase:'play'|'locked'|'done',
+      timeLeft, deadline, winner }
+```
+- `turn` / `winner` values: **1 = host, 2 = guest**, `winner 0 = tie`.
+- **Scores are ABSOLUTE on both phones:** `scores[1]` = host, `scores[2]` = guest.
+  When displaying, resolve by role: host shows own = `scores[1]`, guest shows own = `scores[2]`.
+- In `EndOverlay`, winner/loser **names** are resolved by whether the *viewer* won (`iWon`), never by mapping `winner 1|2` onto my/their.
+- Mismatch → `phase:'locked'` for 950 ms → cards flip back, turn swaps, fresh 10 s timer.
+- Timeout is enforced by the **host only** and broadcast to the guest.
 
-### Engine state
+### Network messages (PeerJS)
+| Message | Direction | Payload / meaning |
+|---|---|---|
+| `hello` | guest→host on connect | `{name, avatar}` |
+| `init` | host→guest on connect & on rematch | `{pairs, deck, hostName, hostAvatar, tl}` - guest rebuilds view |
+| `sync` | host→guest after every change + 1 Hz | `{cards, flipped, s1, s2, phase, turn, winner, tl, ev}` |
+| `tap` | guest→host | `{cardId}` - host validates and resolves |
+| `rematch-req` | guest→host | `{name}` - host shows "Accept / Not now", **never auto-starts** |
+| `bye` | either | opponent shows LostOverlay |
 
-`S = { pairs, deck:[artIds], cards:[{id,art,state:'down|up|matched'}], flipped:[ids],
-scores:{1,2}, turn:1|2, phase:'play|locked|done', timeLeft, deadline, winner }`.
-Scores are ABSOLUTE: `scores[1]` = host, `scores[2]` = guest, on both phones. Views resolve by role:
-- Host: own score = `scores[1]`, opponent = `scores[2]`.
-- Guest: own score = `scores[2]`, opponent = `scores[1]`.
-EndOverlay resolves winner/loser names by `iWon` (whether the VIEWER won), never by mapping `winner 1|2` onto my/their (those are already role-relative).
-Mismatch -> `phase:'locked'` for `CFG.LOCK_MS` (950 ms) -> flip back + turn swap + fresh `TURN_SECONDS` (10 s). Timeout is checked by the **host only** (`checkTimeout`) and broadcast with `ev:'timeout'`.
+- A **new host connection always takes over** the old one (reconnect support).
+- Fake PeerJS quirk: both peers must be `open=true` before either 'open' event fires, or `FakeConn.send()` drops messages.
 
-## How to work
+## 5. Hard rules (owner's, never violate)
+
+1. **Mobile first** - game screen is a locked `100dvh` flex column, no page scroll.
+2. **No emoji in the UI** - use the logo and `Icons.jsx` SVGs only.
+3. **Avatars are a user choice** (4 Dili stickers), never random.
+4. **First-join flow**: `?join=CODE` without a saved identity → popup → straight into the game.
+5. **Fixed rules**: 2 flips/turn; match = +1 and go again; mismatch or timeout = flip back + other player.
+6. **Claymorphism**, cards at random non-overlapping positions, 10 Dili GIFs are the ONLY faces.
+7. **Credit**: no plain "@BadhonAI" text, follow button only.
+8. **Free hosting only** - no paid services; owner uploads `dist/*` manually.
+9. **Rematch requires host approval** (a `rematch-req` must never auto-restart).
+10. **No em dash (U+2014) anywhere** - not in UI, captions, metadata, or comments. Use commas/periods.
+
+## 6. Everyday workflow
 
 ```bash
 cd /home/user/dilicards
-npm install        # node_modules does NOT persist between sessions - always run first
-npm test           # all 3 suites (120 assertions)
-npm run build      # -> dist/
-npm run dev        # Vite dev server (if you need live reload)
+npm install      # node_modules does NOT persist between sessions - always run first
+npm test         # 3 suites, 120 assertions - must stay green
+npm run build    # → dist/  (owner uploads this to dilicard.badhon.online)
 ```
 
-**Every change -> `npm test` -> `npm run build` -> commit -> push -> ALSO UPDATE THIS AGENTS.md.** Then tell the owner: "redeploy by uploading `dist/*` to the root of dilicard.badhon.online" (they do it manually; no CI).
+**On every change:** edit → `npm test` → `npm run build` → commit → **update this AGENTS.md** → push → remind the owner to re-upload `dist/*`.
 
-- Tweak game feel in `src/config.js` (timer, lock, board sizes, layout, links).
-- The p2p suite is the safety net for network flow changes. If it fails, fix the app, not the assertions (unless the scenario itself is wrong).
-- `test/p2p.test.mjs` step 8b: a rejoin must match the host's **current** state snapshot (phase/scores/deck), not a fixed expectation - the scenario rejoins after a rematch.
-- Fake PeerJS quirk: both peers must be `open=true` **before** either 'open' event fires, or `FakeConn.send()` drops messages.
-- React SSR renders escape `'` as `&#x27;` and insert `<!-- -->` between adjacent expressions - write test assertions accordingly.
-- **No em dash (U+2014) anywhere** (owner rule). Use comma/period. Applies to UI strings, captions, metadata, and comments.
+Push (PAT is not stored in git config; local remote is the clean URL):
+```bash
+git config user.name "badhonai"                                   # identity resets between sessions
+git config user.email "badhonai@users.noreply.github.com"
+git push "https://x-access-token:<PAT>@github.com/badhonai/DiliCards.git" main
+```
 
-## Environment gotchas
+## 7. Environment gotchas
 
-- **Sandbox != phone.** The PeerJS broker (`0.peerjs.com`) returns Cloudflare 1020 from this datacenter - that's expected; the game works from real phones. Tests use the fake PeerJS.
-- `node_modules` and background processes do **not** survive between sessions. Reinstall deps when the suite/build fails with `Cannot find package`/`vite not found`.
-- To preview the built site: `python3 -m http.server 8000 --bind 0.0.0.0 -d dist` (user can open the port-8000 preview).
-- PIL + DejaVu fonts available for image mockups; `image_search`/`generate_image` available for new art.
-- GitHub push: owner pasted a PAT into the chat (used for pushes). **Owner was told to revoke it.** If a push 403s, ask the owner for a new token; push URL pattern: `https://x-access-token:<PAT>@github.com/badhonai/DiliCards.git`. The local git remote is set to the clean URL `https://github.com/badhonai/DiliCards.git` (no token in the config); push with the PAT-in-URL form: `git push "https://x-access-token:<PAT>@github.com/badhonai/DiliCards.git" main`.
-- Git author identity resets between sessions; run `git config user.name "badhonai"` + `git config user.email "badhonai@users.noreply.github.com"` before committing if the commit fails with "Author identity unknown".
-
-## Recent history (newest first)
-
-- **`d57b003`** - Rematch requires host approval (no auto-restart, winner can download/share the score card first); "(you)" marker on end screen fixed to true identity (was wrong when host won).
-- **`5f86ce8`** - EndOverlay winner/loser names fixed to resolve by role (`iWon`), locked-state label "flipping back...", +8 role-matrix render tests.
-- **`b64c927`** - GameScreen/EndOverlay scores resolved by role (opponent card showed the viewer's own score on the host phone), data-who attr + tests.
-- **`a570395`** - Pencil badge back on top of the avatar circle (inner clip wrapper for the sticker, badge outside the clip).
-- **`de500fe`** - og.png blue card character content-fit (zoom-out, no clipped flames).
-- **`1ec6b61` / `eb500be`** - og.png layout: brand block + site link LEFT, artwork RIGHT, vertically centered.
-- **`2b344c6`** - pfp chooser overflow fix, scorecard options renamed "Preset A / Preset B", all em dashes removed from src + index.html, title "DiliCards by BadhonAI", polished 1200x630 og.png.
-- **`1ccefb5`** - Winner score cards shipped (ScorecardPicker + scorecard.js, hide-opponent toggle, save + X share), pfp clip fix, richer metadata.
-- **`58ce6cc`** - Removed white glass overlay from flipped card faces (GIFs now crisp at full contrast).
-- **`7a4efae`** - Fixed invisible board (computeLayout was called without `pct` -> NaN positions), new citrus logo + warm orange theme.
-- **`7a1e421`** and earlier - postcard gate-off + first AGENTS.md handoff; React+Vite rebuild; P2P over PeerJS.
-
-## Open items / likely next prompts
-
-1. **More scorecard backgrounds:** owner may approve the extra ones in `src/assets/scorecards/` (classic/ring/night). To add: append an entry to `SCORECARD_VARIANTS` in `src/game/scorecard.js` and add the layout branch in `renderScorecard`.
-2. Anything gameplay-related: edit `config.js` + engine, keep the 120-assertion suite green.
-3. Deploy: always remind the owner to upload `dist/*` after a build (and `og.png`/`favicon.png` to the site root for link previews).
+- **Sandbox ≠ phone.** The PeerJS broker returns Cloudflare 1020 from this datacenter; the game works from real phones. Tests use the fake PeerJS.
+- `node_modules` and running servers do **not** survive between sessions. If `npm test`/`build` says "Cannot find package" or "vite not found", run `npm install` and retry.
+- Preview the built site: `python3 -m http.server 8000 --bind 0.0.0.0 -d dist`.
+- PIL + DejaVu fonts available for image work. `image_search`/`generate_image` for new art.
+- React SSR escapes `'` as `&#x27;` and inserts `<!-- -->` between adjacent expressions - write render-test assertions accordingly.
+- If a push 403s, ask the owner for a fresh PAT and use the URL form above.
