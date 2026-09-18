@@ -1,7 +1,7 @@
 /**
- * DILICARDS — SSR render smoke test (run: npm run test:render)
+ * DILICARDS  -  SSR render smoke test (run: npm run test:render)
  * Loads the real components through Vite (JSX + assets) and renders
- * every screen to string — catches wiring/typo/crash bugs early.
+ * every screen to string  -  catches wiring/typo/crash bugs early.
  */
 import React from 'react';
 import { createServer } from 'vite';
@@ -135,7 +135,7 @@ try{
   ok(e.includes('Winner score card'), 'winner sees the shareable score card');
   ok(e.includes('Share on X'), 'score card has an X share button');
   ok(e.includes('Show opponent name'), 'score card offers the hide-opponent toggle');
-  ok(e.includes('Preset A') && e.includes('Preset B'), 'score card offers both approved backgrounds');
+  ok(e.includes('Preset A') && e.includes('Preset B') && e.includes('Preset C') && e.includes('Preset D') && e.includes('Preset E'), 'score card offers all approved presets');
 
   S.phase='done'; S.winner=2;
   const eLose = renderToString(React.createElement(EndOverlay, {

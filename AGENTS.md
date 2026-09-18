@@ -17,7 +17,7 @@ A **2-player, real-time memory-match (concentration) game played on two phones**
 
 | Feature | State |
 |---|---|
-| Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 2 backgrounds "Preset A"/"Preset B", hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
+| Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 5 presets "Preset A" to "Preset E" (Hero, Banner, Midnight, Solar, Classic), hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
 | Old winner **postcards** | **OFF** (`CFG.POSTCARDS_ENABLED=false`). Round 1 rejected by owner. Do NOT enable without owner approval. |
 | Rematch | **Host must approve.** Guest sends a request; nothing restarts until the host accepts. |
 | Identity | User picks name + one of 4 Dili stickers (never random). Saved to localStorage. |
@@ -45,8 +45,7 @@ dilicards/
 │   │   ├── art/art-0..9.gif   the 10 Dili GIFs = THE ONLY card faces
 │   │   ├── dili-*.png         4 stickers = avatar pool + mascots
 │   │   ├── postcards/*.jpg    6 rejected postcard backgrounds (keep, unused)
-│   │   └── scorecards/        sc-hero + sc-banner = THE score cards in use
-│   │                          (sc-classic/ring/night = extras, not referenced yet)
+│   │   └── scorecards/        sc-hero, sc-banner, sc-night, sc-ring, sc-classic (all 5 active)
 │   ├── game/                  pure logic, no React, unit-testable
 │   │   ├── engine.js          ★ state machine: flips, match/mismatch, timer, scores, sync payloads
 │   │   ├── net.js             PeerJS wrapper: createHost/createGuest/send/makeCode
