@@ -3,6 +3,7 @@ import { avatarUrl } from '../game/avatar.js';
 import Board from './Board.jsx';
 import EndOverlay from './EndOverlay.jsx';
 import LostOverlay from './LostOverlay.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 import { IconHome, IconLink, IconMute, IconSound } from './Icons.jsx';
 
 /**
@@ -16,13 +17,14 @@ export default function GameScreen({
   connected, lost, roomCode, roomLink,
   onCardTap, onGoHome, onRematch, onRetry, onCopyLink, onMute,
   rematchReq, rematchSent, onAcceptRematch, onDeclineRematch,
+  theme = 'dark', onToggleTheme = () => {},
 }){
   const isHost = role==='host';
   const myName = (isHost ? name : guestName) || (isHost ? 'Player 1' : 'Player 2');
   const meAv = isHost ? avatar : guestAvatar;
   const themName = (isHost ? guestName : hostName) || (isHost ? 'Player 2' : 'Player 1');
   const themAv = isHost ? guestAvatar : hostAvatar;
-  // scores are stored as { 1: host, 2: guest } — resolve by role, never hardcode
+  // scores are stored as { 1: host, 2: guest }, resolve by role, never hardcode
   const myScore = isHost ? S.scores[1] : S.scores[2];
   const theirScore = isHost ? S.scores[2] : S.scores[1];
 
@@ -83,6 +85,7 @@ export default function GameScreen({
         <div className="dock-actions">
           {S.phase!=='done' && (
             <>
+              <ThemeToggle theme={theme} onToggle={onToggleTheme} compact />
               <button className="icon-btn" onClick={onMute} aria-label="Toggle sound">
                 {muted ? <IconMute size={17}/> : <IconSound size={17}/>}
               </button>
@@ -115,6 +118,7 @@ export default function GameScreen({
           roomCode={roomCode} roomLink={roomLink} onCopyLink={onCopyLink}
           rematchReq={rematchReq} rematchSent={rematchSent}
           onAcceptRematch={onAcceptRematch} onDeclineRematch={onDeclineRematch}
+          theme={theme} onToggleTheme={onToggleTheme}
         />
       )}
     </div>

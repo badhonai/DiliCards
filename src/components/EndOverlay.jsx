@@ -1,8 +1,10 @@
 import { CFG } from '../config.js';
 import { avatarUrl } from '../game/avatar.js';
 import ScorecardPicker from './ScorecardPicker.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 import { IconClose, IconCopy, IconHome, IconRefresh, IconTrophy } from './Icons.jsx';
 import logo from '../assets/logo.png';
+import logoWhite from '../assets/logo-white.png';
 import diliHappy from '../assets/dili-happy.png';
 import diliFunny from '../assets/dili-funny.png';
 import diliCool from '../assets/dili-cool.png';
@@ -16,6 +18,7 @@ export default function EndOverlay({
   S, isHost, myName, theirName, myAvatar, theirAvatar,
   onRematch, onGoHome, roomCode, roomLink, onCopyLink,
   rematchReq, rematchSent, onAcceptRematch, onDeclineRematch,
+  theme = 'dark', onToggleTheme = () => {},
 }){
   if(!S) return null;
   const w = S.winner;
@@ -23,6 +26,7 @@ export default function EndOverlay({
   const guestScore = S.scores[2];
   const myScore = isHost ? hostScore : guestScore;
   const theirScore = isHost ? guestScore : hostScore;
+  const logoSrc = theme === 'dark' ? logoWhite : logo;
 
   const iWon = (w===1 && isHost) || (w===2 && !isHost);
   const isDraw = w===0;
@@ -125,7 +129,10 @@ export default function EndOverlay({
 
         <div className="end-foot">
           <button className="mini-link" onClick={onCopyLink}><IconCopy size={13}/> copy room link</button>
-          <span className="mini-logo"><img src={logo} alt=""/></span>
+          <div className="end-foot-right">
+            {onToggleTheme && <ThemeToggle theme={theme} onToggle={onToggleTheme} compact />}
+            <span className="mini-logo"><img src={logoSrc} alt=""/></span>
+          </div>
         </div>
       </div>
     </div>

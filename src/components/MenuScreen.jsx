@@ -7,6 +7,7 @@ import diliHappy from '../assets/dili-happy.png';
 import diliCool from '../assets/dili-cool.png';
 import diliFunny from '../assets/dili-funny.png';
 import logo from '../assets/logo.png';
+import logoWhite from '../assets/logo-white.png';
 
 /**
  * The home screen.
@@ -16,11 +17,13 @@ export default function MenuScreen({
   name, avatar, hasIdentity,
   sizePairs, setSizePairs,
   onCreate, onJoin, onEditIdentity,
+  theme = 'dark', onToggleTheme = () => {},
 }){
   const [joinCode, setJoinCode] = useState('');
   const canPlay = hasIdentity;
   const joinTarget = (joinCode||'').trim().toUpperCase();
   const avSrc = avatarUrl(avatar);
+  const logoSrc = theme === 'dark' ? logoWhite : logo;
 
   return (
     <div className="menu-wrap">
@@ -29,7 +32,7 @@ export default function MenuScreen({
 
       <div className="menu-head">
         <div className="logo-row">
-          <img className="logo-img" src={logo} alt=""/>
+          <img className="logo-img" src={logoSrc} alt=""/>
           <h1 className="logo">DiliCards</h1>
         </div>
         <div className="tag">Flip 2 · Match them · Beat your friend</div>

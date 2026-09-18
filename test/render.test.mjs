@@ -23,6 +23,9 @@ try{
   const { default: App } = await server.ssrLoadModule('/src/App.jsx');
   const menu = renderToString(React.createElement(App));
   ok(menu.includes('DiliCards'), 'App renders with game name');
+  ok(menu.includes('data-theme="dark"'), 'App renders in dark theme by default');
+  ok(menu.includes('theme-toggle'), 'App renders theme toggle');
+  ok(menu.includes('Light') && menu.includes('Dark'), 'theme toggle has light and dark options');
   ok(menu.includes('Create game'), 'menu has create action card');
   ok(menu.includes('Join a game'), 'menu has join action card');
   ok(menu.includes('YOUR NAME'), 'menu shows name identity');
@@ -73,6 +76,7 @@ try{
     onCardTap:()=>{}, onGoHome:()=>{}, onRematch:()=>{}, onRetry:()=>{}, onCopyLink:()=>{}, onMute:()=>{},
   }));
   ok(g.includes('Badhon'), 'game screen shows host name');
+  ok(g.includes('theme-btn-compact'), 'game screen includes dock theme toggle');
   ok((g.match(/class="card"/g)||[]).length===12, 'board renders 12 cards');
   ok(g.includes('your turn'), 'host turn: your-turn label on own (bottom) card');
 

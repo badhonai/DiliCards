@@ -1,4 +1,6 @@
 import { useDiliGame } from './hooks/useDiliGame.js';
+import { useTheme } from './hooks/useTheme.js';
+import ThemeToggle from './components/ThemeToggle.jsx';
 import MenuScreen from './components/MenuScreen.jsx';
 import HostScreen from './components/HostScreen.jsx';
 import JoinScreen from './components/JoinScreen.jsx';
@@ -11,7 +13,7 @@ import { CFG } from './config.js';
 async function shareText(text, url){
   if(navigator.share){
     try{ await navigator.share({ title:CFG.GAME_NAME, text, url }); return; }
-    catch(e){ /* cancelled  -  fall through to copy */ }
+    catch(e){ /* cancelled - fall through to copy */ }
   }
   try{ await navigator.clipboard.writeText(text + ' ' + url); }
   catch(e){ /* no clipboard */ }
@@ -20,6 +22,7 @@ async function shareText(text, url){
 
 export default function App(){
   const g = useDiliGame();
+  const { theme, toggleTheme } = useTheme();
 
   const copyLink = async ()=>{
     try{
@@ -31,7 +34,13 @@ export default function App(){
   };
 
   return (
-    <div className="app">
+    <div className={`app ${theme}-theme`} data-theme={theme}>
+      {g.screen !== 'game' && (
+        <div className="top-utility-bar">
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+        </div>
+      )}
+
       {g.screen==='menu' && (
         <MenuScreen
           name={g.name}
@@ -42,6 +51,8 @@ export default function App(){
           onCreate={g.createGame}
           onJoin={g.joinGame}
           onEditIdentity={()=>g.openOnboard(null)}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
       )}
 
@@ -55,6 +66,8 @@ export default function App(){
           onCopy={copyLink}
           onShare={()=>shareText(`Play ${CFG.GAME_NAME} with me! Join code: ${g.roomCode}`, g.roomLink())}
           onGoHome={g.goHome}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
       )}
 
@@ -68,6 +81,8 @@ export default function App(){
           onGoHome={g.goHome}
           onRetry={g.tryJoin}
           onCopyLink={copyLink}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
       )}
 
@@ -96,6 +111,8 @@ export default function App(){
           onRetry={g.role==='guest' ? g.tryJoin : ()=>{}}
           onCopyLink={copyLink}
           onMute={g.toggleMute}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
       )}
 

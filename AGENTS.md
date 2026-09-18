@@ -18,10 +18,11 @@ A **2-player, real-time memory-match (concentration) game played on two phones**
 | Feature | State |
 |---|---|
 | Winner **score cards** | **ON** (`CFG.SCORECARD_ENABLED=true`). Winner-only, end screen. 7 presets "Preset A" to "Preset G" (Hero, Banner, Midnight, Solar, Classic, Cobalt, Cyber), hide/show opponent name, Save PNG, Share on X (prefilled tweet). |
+| Theme system | **Default Dark & Blue** with full Light (warm clay) mode. Theme toggle switch on top utility bar (`ThemeToggle.jsx`) and in game dock. State persisted in localStorage (`dili_theme`). |
 | Old winner **postcards** | **OFF** (`CFG.POSTCARDS_ENABLED=false`). Round 1 rejected by owner. Do NOT enable without owner approval. |
 | Rematch | **Host must approve.** Guest sends a request; nothing restarts until the host accepts. |
 | Identity | User picks name + one of 4 Dili stickers (never random). Saved to localStorage. |
-| Tests | **120/120 green** (engine 40, render 43, p2p 37). |
+| Tests | **124/124 green** (engine 40, render 47, p2p 37). |
 
 ## 3. File map (where everything lives)
 
@@ -55,10 +56,12 @@ dilicards/
 │   │   ├── postcard.js        old postcards renderer (OFF, leave alone)
 │   │   └── scorecard.js       ★ SCORECARD_VARIANTS + renderScorecard + tweetText (canvas)
 │   ├── hooks/
-│   │   └── useDiliGame.js     ★ the orchestrator: screens, role, conns, timers,
-│   │                          onboarding, message handlers, rematch approval, wake lock
+│   │   ├── useDiliGame.js     ★ the orchestrator: screens, role, conns, timers,
+│   │   │                      onboarding, message handlers, rematch approval, wake lock
+│   │   └── useTheme.js        theme switcher: dark (default) and light with localStorage
 │   └── components/
 │       ├── MenuScreen.jsx     home: identity card, board-size chips, Create/Join
+│       ├── ThemeToggle.jsx    segmented pill switch and compact icon button
 │       ├── OnboardModal.jsx   bottom sheet: name + 4-sticker picker
 │       ├── HostScreen.jsx     waiting room: code, copy/share link, waiting list
 │       ├── JoinScreen.jsx     connecting screen + real error messages

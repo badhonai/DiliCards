@@ -1,5 +1,6 @@
 import { avatarUrl } from '../game/avatar.js';
 import logo from '../assets/logo.png';
+import logoWhite from '../assets/logo-white.png';
 import { IconCopy, IconRefresh } from './Icons.jsx';
 
 const ERR_TEXT = {
@@ -12,18 +13,23 @@ const ERR_TEXT = {
 
 /**
  * The "joining a friend's room" screen (guest).
- * Shows what's being joined and gives real, readable errors  - 
+ * Shows what's being joined and gives real, readable errors -
  * never an endless spinner.
  */
-export default function JoinScreen({ name, avatar, roomCode, connected, onGoHome, onRetry, onCopyLink, err }){
+export default function JoinScreen({
+  name, avatar, roomCode, connected,
+  onGoHome, onRetry, onCopyLink, err,
+  theme = 'dark', onToggleTheme = () => {},
+}){
   const avSrc = avatarUrl(avatar);
+  const logoSrc = theme === 'dark' ? logoWhite : logo;
   const errText = (err && ERR_TEXT[err]) || (err ? 'Something went wrong. Try again.' : null);
 
   return (
     <div className="join-wrap">
       <div className="join-panel">
         <div className="join-head">
-          <img className="logo-img sm" src={logo} alt=""/>
+          <img className="logo-img sm" src={logoSrc} alt=""/>
           <div>
             <div className="join-title">Joining room</div>
             <div className="code-display sm">{roomCode}</div>

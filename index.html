@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
@@ -12,11 +12,19 @@
     <meta name="robots" content="index, follow" />
 
     <!-- ═══════════════ Theme & app bits ═══════════════ -->
-    <meta name="theme-color" content="#f7e9d7" />
+    <meta name="theme-color" content="#060b17" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="DiliCards" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <script>
+      try{
+        var savedTheme = localStorage.getItem('dili_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        var metaTheme = document.querySelector('meta[name="theme-color"]');
+        if(metaTheme) metaTheme.setAttribute('content', savedTheme === 'dark' ? '#060b17' : '#f7e9d7');
+      }catch(e){}
+    </script>
     <link rel="canonical" href="https://dilicard.badhon.online" />
     <link rel="icon" type="image/png" href="./favicon.png" />
     <link rel="apple-touch-icon" href="./favicon.png" />
